@@ -31,7 +31,6 @@ for i in $(seq $NUM_EXPERIENCES); do
     mkdir "${EXPERIENCE_DIRECTORY}"
     touch "${EXPERIENCE_DIRECTORY}/experience_${ID}.sim"
     touch "${EXPERIENCE_DIRECTORY}/my_other_config.yaml"
-    
 
     # Copy it up to S3
     EXPERIENCE_PREFIX="${RESIM_SANDBOX_S3_PREFIX}/${ID}"
@@ -43,5 +42,4 @@ for i in $(seq $NUM_EXPERIENCES); do
 	  --location "${EXPERIENCE_PREFIX}" \
 	  --name "Hello World Experience ${ID}" \
 	  --project "${RESIM_SANDBOX_PROJECT}"
-    
 done
