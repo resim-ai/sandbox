@@ -8,7 +8,7 @@ _install_resim_cli() {
 
 _su_install_resim_cli() {
     # If we have sudo, use it
-    if command -v sudo 
+    if command -v sudo
     then
 	s="sudo"
     fi
