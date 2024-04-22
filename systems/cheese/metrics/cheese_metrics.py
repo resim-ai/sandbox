@@ -257,10 +257,9 @@ def early_exit_if_batch_metrics():
     if Path("/tmp/resim/inputs/batch_metrics_config.json").is_file():
         print("Batch metrics not yet supported!")
         sys.exit(0)
-    print("Not batch metrics!")
-    
 
 if __name__ == "__main__":
+  early_exit_if_batch_metrics()
   metrics_writer = ResimMetricsWriter(uuid.uuid4()) # Make metrics writer!
   scalar_metric_demo(metrics_writer)
   line_plot_metric_demo(metrics_writer)
