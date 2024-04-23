@@ -62,8 +62,8 @@ project_id = get_project_id()
 
 arguments = [{
     "arguments": [3.14159265758979323, 0.5, 2.0],
-    "num_iterations": 2
-}]
+    "num_iterations": 2 * ii
+} for ii in range(10)]
 
 
 s3_prefix = os.getenv("RESIM_SANDBOX_S3_PREFIX")
