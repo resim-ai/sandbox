@@ -19,11 +19,6 @@ from resim.metrics.python.metrics import (
   MetricImportance
 )
  
-def early_exit_if_batch_metrics():
-    if Path("/tmp/resim/inputs/batch_metrics_config.json").is_file():
-        print("Batch metrics not yet supported!")
-        sys.exit(0)
-
 @dataclass
 class ExperienceConfig:
     arguments: float
@@ -297,6 +292,16 @@ def write_proto(writer):
   # Known location where the runner looks for metrics
   with open('/tmp/resim/outputs/metrics.binproto', 'wb') as f:
     f.write(metrics_proto.metrics_msg.SerializeToString())
+
+def early_exit_if_batch_metrics():
+    if Path("/tmp/resim/inputs/batch_metrics_config.json").is_file():
+        metrics_writer = ResimMetricsWriter(uuid.uuid4()) # Make metrics writer!
+        line_plot_metric_demo(metrics_writer)
+        bar_chart_metric_demo(metrics_writer)
+        histogram_metric_demo(metrics_writer)
+        line_plot_metric_demo_2(metrics_writer)
+        write_proto(metrics_writer)
+        sys.exit(0)
 
 def main():
   early_exit_if_batch_metrics()

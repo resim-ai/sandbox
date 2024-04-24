@@ -1,6 +1,6 @@
 FROM ubuntu:jammy
 
-RUN head -c 10G </dev/urandom >/bigfile
+RUN head -c 8G </dev/urandom >/bigfile
 
 RUN apt update && apt -y install build-essential python3 python3-pip
 

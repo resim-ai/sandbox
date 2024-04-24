@@ -20,8 +20,8 @@ from resim.metrics.python.metrics import (
 )
 
 
-NUM_PROCS = 8
-MEM_GB = 24
+NUM_PROCS = 4
+MEM_GB = 12
 B_PER_GB = 2**30
 DURATION_S = 300
 NUMBER_OF_METRICS = 30
