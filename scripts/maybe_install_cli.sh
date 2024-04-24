@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# This script installs resim's cli api client, if it's not already installed
 
 _install_resim_cli() {
     curl -L https://github.com/resim-ai/api-client/releases/latest/download/resim-linux-amd64 -o /usr/bin/resim
