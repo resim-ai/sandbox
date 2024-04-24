@@ -15,6 +15,15 @@ from resim_python_client.api.experiences import create_experience
 from resim_python_client.api.projects import list_projects
 from resim_python_client.models.experience import Experience
 
+project = os.getenv("RESIM_SANDBOX_PROJECT")
+assert project is not None, "RESIM_SANDBOX_PROJECT must be set!"
+
+api_url = os.getenv("RESIM_API_URL")
+assert api_url is not None
+
+auth_url = os.getenv("RESIM_AUTH_URL")
+assert auth_url is not None
+
 
 class HasNextPageToken(typing.Protocol):
     """A simple protocol for classes having the next_page_token field"""
@@ -42,14 +51,12 @@ def fetch_all_pages(endpoint: typing.Callable[..., ResponseType],
     return responses
 
 
-auth_client = DeviceCodeClient(domain="https://resim.us.auth0.com")
+auth_client = DeviceCodeClient(domain=auth_url, client_id="Rg1F0ZOCBmVYje4UVrS3BKIh4T2nCW9y")
 token = auth_client.get_jwt()["access_token"]
 
-resim_api_client = AuthenticatedClient(base_url="https://api.resim.ai/v1",
+resim_api_client = AuthenticatedClient(base_url=api_url,
                                        token=token)
 
-project = os.getenv("RESIM_SANDBOX_PROJECT")
-assert project is not None, "RESIM_SANDBOX_PROJECT must be set!"
 
 def get_project_id():
     project_id = None
@@ -101,6 +108,7 @@ def register_experience(id, s3_path):
     response = create_experience.sync(client=resim_api_client,
                                       body=experience,
                                       project_id=project_id)
+    print(response.experience_id)
     assert response is not None
 
 

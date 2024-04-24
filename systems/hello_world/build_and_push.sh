@@ -36,6 +36,7 @@ _set_default RESIM_SANDBOX_BUILD_TAG_PREFIX "hello_world_"
 _set_default RESIM_SANDBOX_METRICS_BUILD_TAG_PREFIX "hello_world_metrics_"
 _set_default RESIM_SANDBOX_BUILD_BRANCH "hello_world_sandbox"
 _set_default RESIM_SANDBOX_BUILD_VERSION "$(git rev-parse HEAD)"
+_set_default RESIM_API_URL "https://api.resim.ai/v1"
 
 echo "Running with..."
 _print RESIM_SANDBOX_ECR       
@@ -68,6 +69,8 @@ docker push "${_FULL_TAG}"
 
 echo "Registering build with ReSim..."
 resim builds create \
+      --url "${RESIM_API_URL}" \
+      --auth-url "${RESIM_AUTH_URL}" \
       --branch "${RESIM_SANDBOX_BUILD_BRANCH}" \
       --description "A ReSim sandbox build." \
       --image "${_FULL_TAG}" \
@@ -83,6 +86,8 @@ docker push "${_FULL_METRICS_TAG}"
 
 echo "Registering build with ReSim..."
 resim metrics-builds create \
+      --url "${RESIM_API_URL}" \
+      --auth-url "${RESIM_AUTH_URL}" \
       --name "A ReSim sandbox metrics build." \
       --image "${_FULL_METRICS_TAG}" \
       --project "${RESIM_SANDBOX_PROJECT}" \
