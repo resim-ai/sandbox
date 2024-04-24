@@ -293,7 +293,7 @@ def write_proto(writer):
   with open('/tmp/resim/outputs/metrics.binproto', 'wb') as f:
     f.write(metrics_proto.metrics_msg.SerializeToString())
 
-def early_exit_if_batch_metrics():
+def maybe_batch_metrics():
     if Path("/tmp/resim/inputs/batch_metrics_config.json").is_file():
         metrics_writer = ResimMetricsWriter(uuid.uuid4()) # Make metrics writer!
         line_plot_metric_demo(metrics_writer)
@@ -304,7 +304,7 @@ def early_exit_if_batch_metrics():
         sys.exit(0)
 
 def main():
-  early_exit_if_batch_metrics()
+  maybe_batch_metrics()
 
   log = load_log()
   experience = load_experience()
