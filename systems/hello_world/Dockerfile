@@ -1,6 +1,6 @@
 FROM python:3
 
-LABEL description="Cheese build docker image"
+LABEL description="Hello world docker image"
 
 COPY src/entrypoint.py /entrypoint.py
 

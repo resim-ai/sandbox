@@ -24,6 +24,8 @@ assert api_url is not None
 auth_url = os.getenv("RESIM_AUTH_URL")
 assert auth_url is not None
 
+client_id = os.getenv("RESIM_CLIENT_ID")
+assert client_id is not None
 
 class HasNextPageToken(typing.Protocol):
     """A simple protocol for classes having the next_page_token field"""
@@ -51,7 +53,8 @@ def fetch_all_pages(endpoint: typing.Callable[..., ResponseType],
     return responses
 
 
-auth_client = DeviceCodeClient(domain=auth_url, client_id="Rg1F0ZOCBmVYje4UVrS3BKIh4T2nCW9y")
+
+auth_client = DeviceCodeClient(domain=auth_url, client_id=client_id)
 token = auth_client.get_jwt()["access_token"]
 
 resim_api_client = AuthenticatedClient(base_url=api_url,
@@ -86,6 +89,7 @@ s3_key_prefix = "/".join(s3_prefix.split("/")[3:])
 
 
 def pathlib_walk(path: pathlib.Path):
+    """Pathlib equivalent of os.path.walk()"""
     subdirs = [d for d in path.iterdir() if d.is_dir()]
     yield path, subdirs, [f for f in path.iterdir() if f.is_file()]
     for d in subdirs:
@@ -93,6 +97,7 @@ def pathlib_walk(path: pathlib.Path):
 
 
 def push_to_bucket(client, staging_path, path, bucketname, key_prefix):
+    """Push the contents of of path to key_prefix / relpath(staging_path, path)"""
     for root, dirs, files in pathlib_walk(path):
         for f in files:
             key = key_prefix / f.relative_to(staging_path)
@@ -100,6 +105,7 @@ def push_to_bucket(client, staging_path, path, bucketname, key_prefix):
 
 
 def register_experience(id, s3_path):
+    """Register an experience at the given s3_path with ReSim"""
     experience = Experience.from_dict({
         "description": "Hello world demo experience.",
         "location": s3_path,
@@ -116,7 +122,6 @@ print("Make sure we have the CLI...")
 subprocess.call(
     ["../../scripts/maybe_install_cli.sh"],
     cwd=pathlib.Path(__file__).parent)
-
 
 staging_dir = tempfile.TemporaryDirectory()
 staging_path = pathlib.Path(staging_dir.name)
