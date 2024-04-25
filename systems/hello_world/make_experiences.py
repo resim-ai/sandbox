@@ -24,16 +24,17 @@ assert api_url is not None
 auth_url = os.getenv("RESIM_AUTH_URL")
 assert auth_url is not None
 
-client_id = os.getenv("RESIM_CLIENT_ID")
+if auth_url.endswith("/"):
+    auth_url = auth_url[:-1]
+
+client_id = os.getenv("RESIM_SANDBOX_CLIENT_ID")
 assert client_id is not None
 
 class HasNextPageToken(typing.Protocol):
     """A simple protocol for classes having the next_page_token field"""
     next_page_token: str
 
-
 ResponseType = typing.TypeVar("ResponseType", bound=HasNextPageToken)
-
 
 def fetch_all_pages(endpoint: typing.Callable[..., ResponseType],
                     *args: typing.Any,
