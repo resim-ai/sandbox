@@ -183,7 +183,6 @@ def line_plot_metric_demo_2(writer):
   )
 
 def bar_chart_metric_demo(writer):
-  
   barnames = SeriesMetricsData(
     name='Object classes',
     series=np.array(["Obj 00","Obj 01", "Obj 02", "Obj 03"]),
@@ -253,18 +252,18 @@ def histogram_metric_demo(writer):
 
 def states_over_time_metric_demo(writer):
   float_second = np.linspace(0., 60., 240) 
-  time_data = SeriesMetricsData(
+  time_data = GroupedMetricsData(
     name="sot_times",
-    series=np.array([Timestamp(secs=int(np.floor(a)), nanos=int(np.floor((a%1)*1E9))) for a in float_second]),
+    category_to_series={"main": np.array([Timestamp(secs=int(np.floor(a)), nanos=int(np.floor((a%1)*1E9))) for a in float_second])},
     unit='s')
-  status_data = SeriesMetricsData(
+  status_data = GroupedMetricsData(
     name="statuses_4",
-    series=np.array([MetricStatus.PASSED_METRIC_STATUS for a in time_data.series]),
+    category_to_series={"main": np.array([MetricStatus.PASSED_METRIC_STATUS for a in time_data.category_to_series["main"]])},
     unit='',
     index_data=time_data)
-  value_data = SeriesMetricsData(
+  value_data = GroupedMetricsData(
     name="states",
-    series=np.array(50*["stationary"]+150*["moving"]+40*["stationary"]),
+    category_to_series={"main": np.array(50*["stationary"]+150*["moving"]+40*["stationary"])},
     unit='',
     index_data=time_data)
   states_set = {"stationary", "moving", "fault"}
@@ -300,6 +299,7 @@ def maybe_batch_metrics():
         bar_chart_metric_demo(metrics_writer)
         histogram_metric_demo(metrics_writer)
         line_plot_metric_demo_2(metrics_writer)
+        states_over_time_metric_demo(metrics_writer)        
         write_proto(metrics_writer)
         sys.exit(0)
 
@@ -317,6 +317,7 @@ def main():
   bar_chart_metric_demo(metrics_writer)
   histogram_metric_demo(metrics_writer)
   line_plot_metric_demo_2(metrics_writer)
+  states_over_time_metric_demo(metrics_writer)
 
   write_proto(metrics_writer)
 
