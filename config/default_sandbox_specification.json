@@ -1,6 +1,6 @@
 {
-  "userID": "",
-  "orgID": "",
+  "userID": "michael@sandbox.resim.ai",
+  "orgID": "sandbox.resim.ai",
   "sandboxSpecification": {
     "projects": [
       {
@@ -134,7 +134,7 @@
         "version": "09331625-d8ab-47b7-9daa-e4c9adda3ea3",
         "descrption": "A ReSim sandbox build.",
         "image": "909785973729.dkr.ecr.us-east-1.amazonaws.com/customer-test-images:hello_world_09331625-d8ab-47b7-9daa-e4c9adda3ea3",
-        "branchName": "sandbox",
+        "branchName": "main",
         "systemName": "SandboxSystem",
         "projectName": "SandboxProject"
       }
