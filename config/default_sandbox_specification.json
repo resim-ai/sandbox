@@ -1,164 +1,164 @@
 {
-  "userID": "michael@sandbox.resim.ai",
-  "orgID": "sandbox.resim.ai",
-  "sandboxSpecification": {
-    "projects": [
-      {
-        "name": "SandboxProject",
-        "description": "A sandbox project for demonstration purposes"
-      }
-    ],
-    "systems": [
-      {
-        "name": "SandboxSystem",
-        "description": "A sandbox system for demonstration purposes",
-        "projectName": "SandboxProject"
-      }
-    ],
-    "experienceTags": [
-      {
-        "name": "built-in",
-        "description": "Experiences the sandbox constructs by default",
-        "projectName": "SandboxProject"
-      }
-    ],
-    "experiences": [
-      {
-        "name": "Sandbox experience bbd39b34-e52f-47bd-bead-655aa455ce87",
-        "description": "A simple sandbox experience",
-        "location": "s3://rerun-staging-experiences/sandbox/bbd39b34-e52f-47bd-bead-655aa455ce87/",
-        "projectName": "SandboxProject",
-        "tags": [
-          "built-in"
-        ]
-      },
-      {
-        "name": "Sandbox experience 55dced2d-fda6-4d8a-8676-2252706ff85c",
-        "description": "A simple sandbox experience",
-        "location": "s3://rerun-staging-experiences/sandbox/55dced2d-fda6-4d8a-8676-2252706ff85c/",
-        "projectName": "SandboxProject",
-        "tags": [
-          "built-in"
-        ]
-      },
-      {
-        "name": "Sandbox experience 1af35fcf-f0d5-4af2-a83a-b389b97c74ef",
-        "description": "A simple sandbox experience",
-        "location": "s3://rerun-staging-experiences/sandbox/1af35fcf-f0d5-4af2-a83a-b389b97c74ef/",
-        "projectName": "SandboxProject",
-        "tags": [
-          "built-in"
-        ]
-      },
-      {
-        "name": "Sandbox experience 6cdebaf2-e368-4f4f-9c64-69cbe9f39baa",
-        "description": "A simple sandbox experience",
-        "location": "s3://rerun-staging-experiences/sandbox/6cdebaf2-e368-4f4f-9c64-69cbe9f39baa/",
-        "projectName": "SandboxProject",
-        "tags": [
-          "built-in"
-        ]
-      },
-      {
-        "name": "Sandbox experience 93c55770-2347-4682-8cb7-a0a23aece5ac",
-        "description": "A simple sandbox experience",
-        "location": "s3://rerun-staging-experiences/sandbox/93c55770-2347-4682-8cb7-a0a23aece5ac/",
-        "projectName": "SandboxProject",
-        "tags": [
-          "built-in"
-        ]
-      },
-      {
-        "name": "Sandbox experience 8f5f9cfe-393c-40f2-8a95-bb719e00f3b3",
-        "description": "A simple sandbox experience",
-        "location": "s3://rerun-staging-experiences/sandbox/8f5f9cfe-393c-40f2-8a95-bb719e00f3b3/",
-        "projectName": "SandboxProject",
-        "tags": [
-          "built-in"
-        ]
-      },
-      {
-        "name": "Sandbox experience 7519a5bb-a591-4ed2-848a-163e7a34156d",
-        "description": "A simple sandbox experience",
-        "location": "s3://rerun-staging-experiences/sandbox/7519a5bb-a591-4ed2-848a-163e7a34156d/",
-        "projectName": "SandboxProject",
-        "tags": [
-          "built-in"
-        ]
-      },
-      {
-        "name": "Sandbox experience 3bc36b8f-d75d-4f9f-b92c-ddd52fa17cc9",
-        "description": "A simple sandbox experience",
-        "location": "s3://rerun-staging-experiences/sandbox/3bc36b8f-d75d-4f9f-b92c-ddd52fa17cc9/",
-        "projectName": "SandboxProject",
-        "tags": [
-          "built-in"
-        ]
-      },
-      {
-        "name": "Sandbox experience 20ea0271-f1bf-48b3-9eaa-d291e0689f3c",
-        "description": "A simple sandbox experience",
-        "location": "s3://rerun-staging-experiences/sandbox/20ea0271-f1bf-48b3-9eaa-d291e0689f3c/",
-        "projectName": "SandboxProject",
-        "tags": [
-          "built-in"
-        ]
-      },
-      {
-        "name": "Sandbox experience f13cd971-75c1-4b12-9a2f-36bdb2cf743c",
-        "description": "A simple sandbox experience",
-        "location": "s3://rerun-staging-experiences/sandbox/f13cd971-75c1-4b12-9a2f-36bdb2cf743c/",
-        "projectName": "SandboxProject",
-        "tags": [
-          "built-in"
-        ]
-      }
-    ],
-    "metricsBuilds": [
-      {
-        "name": "Sandbox Metrics",
-        "version": "09331625-d8ab-47b7-9daa-e4c9adda3ea3",
-        "image": "909785973729.dkr.ecr.us-east-1.amazonaws.com/customer-test-images:hello_world_metrics_09331625-d8ab-47b7-9daa-e4c9adda3ea3",
-        "projectName": "SandboxProject"
-      }
-    ],
-    "branches": [
-      {
-        "name": "main",
-        "type": "MAIN",
-        "projectName": "SandboxProject"
-      }
-    ],
-    "builds": [
-      {
-        "version": "09331625-d8ab-47b7-9daa-e4c9adda3ea3",
-        "descrption": "A ReSim sandbox build.",
-        "image": "909785973729.dkr.ecr.us-east-1.amazonaws.com/customer-test-images:hello_world_09331625-d8ab-47b7-9daa-e4c9adda3ea3",
-        "branchName": "main",
-        "systemName": "SandboxSystem",
-        "projectName": "SandboxProject"
-      }
-    ],
-    "batches": [
-      {
-        "buildBranchName": "main",
-        "buildVersion": "09331625-d8ab-47b7-9daa-e4c9adda3ea3",
-        "metricsBuildName": "Sandbox Metrics",
-        "metricsBuildVersion": "09331625-d8ab-47b7-9daa-e4c9adda3ea3",
-        "projectName": "SandboxProject",
-        "experienceNames": [
-          "Sandbox experience bbd39b34-e52f-47bd-bead-655aa455ce87",
-          "Sandbox experience 55dced2d-fda6-4d8a-8676-2252706ff85c",
-          "Sandbox experience 1af35fcf-f0d5-4af2-a83a-b389b97c74ef",
-          "Sandbox experience 6cdebaf2-e368-4f4f-9c64-69cbe9f39baa",
-          "Sandbox experience 93c55770-2347-4682-8cb7-a0a23aece5ac",
-          "Sandbox experience 8f5f9cfe-393c-40f2-8a95-bb719e00f3b3",
-          "Sandbox experience 7519a5bb-a591-4ed2-848a-163e7a34156d",
-          "Sandbox experience 3bc36b8f-d75d-4f9f-b92c-ddd52fa17cc9",
-          "Sandbox experience 20ea0271-f1bf-48b3-9eaa-d291e0689f3c",
-          "Sandbox experience f13cd971-75c1-4b12-9a2f-36bdb2cf743c"
-        ]
-      }
-    ]
-  }
+    "userID": "michael@sandbox.resim.ai",
+    "orgID": "sandbox.resim.ai",
+    "sandboxSpecification": {
+	"projects": [
+	    {
+		"name": "SandboxProject",
+		"description": "A sandbox project for demonstration purposes"
+	    }
+	],
+	"systems": [
+	    {
+		"name": "SandboxSystem",
+		"description": "A sandbox system for demonstration purposes",
+		"projectName": "SandboxProject"
+	    }
+	],
+	"experienceTags": [
+	    {
+		"name": "built-in",
+		"description": "Experiences the sandbox constructs by default",
+		"projectName": "SandboxProject"
+	    }
+	],
+	"experiences": [
+	    {
+		"name": "Sandbox experience 621a0683-041b-4588-aab3-a310d268f88e",
+		"description": "A simple sandbox experience",
+		"location": "s3://rerun-staging-experiences/sandbox/621a0683-041b-4588-aab3-a310d268f88e/",
+		"projectName": "SandboxProject",
+		"tags": [
+		    "built-in"
+		]
+	    },
+	    {
+		"name": "Sandbox experience 69cf59de-8571-47fd-95df-df1c0dce0b7c",
+		"description": "A simple sandbox experience",
+		"location": "s3://rerun-staging-experiences/sandbox/69cf59de-8571-47fd-95df-df1c0dce0b7c/",
+		"projectName": "SandboxProject",
+		"tags": [
+		    "built-in"
+		]
+	    },
+	    {
+		"name": "Sandbox experience 984c60b2-45e3-4b9a-a713-8e750a8eb8b1",
+		"description": "A simple sandbox experience",
+		"location": "s3://rerun-staging-experiences/sandbox/984c60b2-45e3-4b9a-a713-8e750a8eb8b1/",
+		"projectName": "SandboxProject",
+		"tags": [
+		    "built-in"
+		]
+	    },
+	    {
+		"name": "Sandbox experience 27553186-94bb-46f4-9a34-0daa2752e1a2",
+		"description": "A simple sandbox experience",
+		"location": "s3://rerun-staging-experiences/sandbox/27553186-94bb-46f4-9a34-0daa2752e1a2/",
+		"projectName": "SandboxProject",
+		"tags": [
+		    "built-in"
+		]
+	    },
+	    {
+		"name": "Sandbox experience 1be5bd2b-cb18-4a87-8575-457eb3fdfc5c",
+		"description": "A simple sandbox experience",
+		"location": "s3://rerun-staging-experiences/sandbox/1be5bd2b-cb18-4a87-8575-457eb3fdfc5c/",
+		"projectName": "SandboxProject",
+		"tags": [
+		    "built-in"
+		]
+	    },
+	    {
+		"name": "Sandbox experience ac211fb6-ced0-4c1b-8786-d6ac32f0c9f3",
+		"description": "A simple sandbox experience",
+		"location": "s3://rerun-staging-experiences/sandbox/ac211fb6-ced0-4c1b-8786-d6ac32f0c9f3/",
+		"projectName": "SandboxProject",
+		"tags": [
+		    "built-in"
+		]
+	    },
+	    {
+		"name": "Sandbox experience 81557fcd-aed2-4102-a65e-7b781c8431d8",
+		"description": "A simple sandbox experience",
+		"location": "s3://rerun-staging-experiences/sandbox/81557fcd-aed2-4102-a65e-7b781c8431d8/",
+		"projectName": "SandboxProject",
+		"tags": [
+		    "built-in"
+		]
+	    },
+	    {
+		"name": "Sandbox experience 5fca4d98-dba5-469d-9b18-faab20b04201",
+		"description": "A simple sandbox experience",
+		"location": "s3://rerun-staging-experiences/sandbox/5fca4d98-dba5-469d-9b18-faab20b04201/",
+		"projectName": "SandboxProject",
+		"tags": [
+		    "built-in"
+		]
+	    },
+	    {
+		"name": "Sandbox experience 34a12786-ff54-4ca8-a5a6-04aa8ca531c3",
+		"description": "A simple sandbox experience",
+		"location": "s3://rerun-staging-experiences/sandbox/34a12786-ff54-4ca8-a5a6-04aa8ca531c3/",
+		"projectName": "SandboxProject",
+		"tags": [
+		    "built-in"
+		]
+	    },
+	    {
+		"name": "Sandbox experience 0cdd6e2f-15d9-4306-a364-19c792e07db4",
+		"description": "A simple sandbox experience",
+		"location": "s3://rerun-staging-experiences/sandbox/0cdd6e2f-15d9-4306-a364-19c792e07db4/",
+		"projectName": "SandboxProject",
+		"tags": [
+		    "built-in"
+		]
+	    }
+	],
+	"metricsBuilds": [
+	    {
+		"name": "Sandbox Metrics",
+		"version": "09331625-d8ab-47b7-9daa-e4c9adda3ea3",
+		"image": "909785973729.dkr.ecr.us-east-1.amazonaws.com/customer-test-images:hello_world_metrics_09331625-d8ab-47b7-9daa-e4c9adda3ea3",
+		"projectName": "SandboxProject"
+	    }
+	],
+	"branches": [
+	    {
+		"name": "main",
+		"type": "MAIN",
+		"projectName": "SandboxProject"
+	    }
+	],
+	"builds": [
+	    {
+		"version": "09331625-d8ab-47b7-9daa-e4c9adda3ea3",
+		"descrption": "A ReSim sandbox build.",
+		"image": "909785973729.dkr.ecr.us-east-1.amazonaws.com/customer-test-images:hello_world_09331625-d8ab-47b7-9daa-e4c9adda3ea3",
+		"branchName": "main",
+		"systemName": "SandboxSystem",
+		"projectName": "SandboxProject"
+	    }
+	],
+	"batches": [
+	    {
+		"buildBranchName": "main",
+		"buildVersion": "09331625-d8ab-47b7-9daa-e4c9adda3ea3",
+		"metricsBuildName": "Sandbox Metrics",
+		"metricsBuildVersion": "09331625-d8ab-47b7-9daa-e4c9adda3ea3",
+		"projectName": "SandboxProject",
+		"experienceNames": [
+		    "Sandbox experience 621a0683-041b-4588-aab3-a310d268f88e",
+		    "Sandbox experience 69cf59de-8571-47fd-95df-df1c0dce0b7c",
+		    "Sandbox experience 984c60b2-45e3-4b9a-a713-8e750a8eb8b1",
+		    "Sandbox experience 27553186-94bb-46f4-9a34-0daa2752e1a2",
+		    "Sandbox experience 1be5bd2b-cb18-4a87-8575-457eb3fdfc5c",
+		    "Sandbox experience ac211fb6-ced0-4c1b-8786-d6ac32f0c9f3",
+		    "Sandbox experience 81557fcd-aed2-4102-a65e-7b781c8431d8",
+		    "Sandbox experience 5fca4d98-dba5-469d-9b18-faab20b04201",
+		    "Sandbox experience 34a12786-ff54-4ca8-a5a6-04aa8ca531c3",
+		    "Sandbox experience 0cdd6e2f-15d9-4306-a364-19c792e07db4"
+		]
+	    }
+	]
+    }
 }

@@ -73,8 +73,8 @@ project_id = get_project_id()
 
 arguments = [{
     "arguments": [3.14159265758979323, 0.5, 2.0],
-    "num_iterations": 2 * ii
-} for ii in range(10)]
+    "num_iterations": ii
+} for ii in range(1, 11)]
 
 
 s3_prefix = os.getenv("RESIM_SANDBOX_S3_PREFIX")
@@ -115,7 +115,6 @@ def register_experience(id, s3_path):
     response = create_experience.sync(client=resim_api_client,
                                       body=experience,
                                       project_id=project_id)
-    print(response.experience_id)
     assert response is not None
 
 
@@ -136,7 +135,6 @@ for experience_contents in arguments:
 
     s3_client = boto3.client('s3')
 
-    print(f"Pushing experience")
     push_to_bucket(
         s3_client,
         staging_path,
@@ -144,4 +142,5 @@ for experience_contents in arguments:
         s3_bucket,
         s3_key_prefix)
     s3_path = f"{s3_prefix}{experience_id}/"
+    print(s3_path)
     register_experience(experience_id, s3_path)
