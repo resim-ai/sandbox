@@ -254,7 +254,7 @@ def histogram_metric_demo(writer):
 def states_over_time_metric_demo(writer):
   float_second = np.linspace(0., 60., 240) 
   time_data = SeriesMetricsData(
-    name="times",
+    name="sot_times",
     series=np.array([Timestamp(secs=int(np.floor(a)), nanos=int(np.floor((a%1)*1E9))) for a in float_second]),
     unit='s')
   status_data = SeriesMetricsData(
