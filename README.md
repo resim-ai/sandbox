@@ -44,7 +44,8 @@ picture, please refer to our [documentation](https://docs.resim.ai/).
      them to a structured format which the ReSim app recognizes uses to create
      plots and other visualizations.
 	 
-Once this is set up, our [Github action](https://github.com/resim-ai/sandbox)
+
+Once this is set up, our [Github action](https://github.com/resim-ai/action)
 can be used to easily set up continuous integration testing so you get
 continuous feedback on how your AI's performance is affected by every change to
 your code.
