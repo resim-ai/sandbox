@@ -4,7 +4,7 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 git_repository(
     name = "resim_open_core",
-    branch = "prod/mikebauer/drone_planning_5",
+    branch = "prod/mikebauer/foo",
     remote = "https://github.com/resim-ai/open-core.git",
 )
 
