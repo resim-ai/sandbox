@@ -1,0 +1,17 @@
+workspace(name = "sandbox")
+
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+
+git_repository(
+    name = "resim_open_core",
+    branch = "prod/mikebauer/drone_planning_5",
+    remote = "https://github.com/resim-ai/open-core.git",
+)
+
+load("@resim_open_core//:deps.bzl", "resim_core_dependencies")
+
+resim_core_dependencies()
+
+load("@resim_open_core//:transitive_deps.bzl", "resim_core_transitive_dependencies")
+
+resim_core_transitive_dependencies()
