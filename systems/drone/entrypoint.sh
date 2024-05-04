@@ -15,6 +15,7 @@ pushd /resim/make_visualization_log.runfiles/resim_open_core/
 
 resim/visualization/log/make_visualization_log \
     --log "${OUTPUTS}/resim_log.mcap" \
-    --output "${OUTPUTS}/vis.mcap"
+    --output "${OUTPUTS}/vis.mcap" \
+    --world_glb "${INPUTS}/world.glb"
 
 popd
