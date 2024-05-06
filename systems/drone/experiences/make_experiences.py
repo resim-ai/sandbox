@@ -87,7 +87,7 @@ with open(LOCAL_EXPERIENCE_DIR / "experience.sim", "r") as  seed_file:
 
 # We create 50 experiences with a variety of goal positions
 goal_positions = [np.random.uniform(low=-500.0, high=500.0, size=2) for _ in range(50)]
-velocity_costs = [np.random.uniform(low=0.0, high=0.1) for _ in range(50)]
+velocity_costs = [np.random.uniform(low=0.0, high=0.2) for _ in range(50)]
 
 
 s3_prefix = os.getenv("RESIM_SANDBOX_S3_PREFIX")
