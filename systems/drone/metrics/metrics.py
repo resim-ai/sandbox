@@ -132,45 +132,6 @@ def ego_metrics(writer, log):
         .with_failure_definition(failure_def))
 
     
-def line_plot_metric_demo(writer):
-  time = SeriesMetricsData(
-    name='Time',
-    series=np.linspace(0.,60.,600),
-    unit='s')
-  accelx = SeriesMetricsData(
-    name='roll',
-    series=np.sin(time.series),
-    unit='rad/s/s')
-  accely = SeriesMetricsData(
-    name='pitch',
-    series=0.5*np.sin(time.series),
-    unit='rad/s/s')
-  accelz = SeriesMetricsData(
-    name='yaw',
-    series=0.25*np.cos(time.series),
-    unit='rad/s/s')
-  status_data = SeriesMetricsData(
-    name="statuses",
-    series=np.array([MetricStatus.PASSED_METRIC_STATUS for a in time.series]),
-    unit='')
-  (
-    writer
-    .add_line_plot_metric("Angular Acceleration")
-    .with_description("Angular acceleration about pitch yaw roll axes.")
-    .with_blocking(False)
-    .with_should_display(True)
-    .with_status(MetricStatus.PASSED_METRIC_STATUS)
-    .append_series_data(time, accelx, "roll")
-    .append_statuses_data(status_data)
-    .append_series_data(time, accely, "pitch")
-    .append_statuses_data(status_data)
-    .append_series_data(time, accelz, "yaw")
-    .append_statuses_data(status_data)
-    .with_importance(MetricImportance.HIGH_IMPORTANCE)
-    .with_x_axis_name("Time")
-    .with_y_axis_name("Angular accel")
-  )
-
 def line_plot_metric_demo_2(writer):
   time = SeriesMetricsData(
     name='Time2',
@@ -326,7 +287,6 @@ def main():
 
   metrics_writer = ResimMetricsWriter(uuid.uuid4()) # Make metrics writer!
   ego_metrics(metrics_writer, log)
-  line_plot_metric_demo(metrics_writer)
   bar_chart_metric_demo(metrics_writer)
   histogram_metric_demo(metrics_writer)
   line_plot_metric_demo_2(metrics_writer)
