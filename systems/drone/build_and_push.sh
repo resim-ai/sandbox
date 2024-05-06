@@ -55,6 +55,10 @@ cd $(dirname "$0")
 echo "Building the build image..."
 ./build.sh
 
+echo "Building the metrics build image..."
+./metrics/build.sh
+
+
 #echo "Building the metrics image..."
 #./metrics/build.sh
 

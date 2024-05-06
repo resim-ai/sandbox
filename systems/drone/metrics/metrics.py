@@ -56,6 +56,7 @@ def ego_metrics(writer, log):
 
     for _, state in id_to_states.items():
         ego_states = state
+    ego_states = ego_states[0::100]
 
     time_to_s = lambda t: t.seconds + 1e-9 * t.nanos
     times = np.array([time_to_s(s.time_of_validity) for s in ego_states])
