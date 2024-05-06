@@ -6,7 +6,7 @@ DIR=$(dirname "$0")
 
 cd "${DIR}"
 
-OPEN_CORE_DIR="${DIR}/../../../open_core/"
+OPEN_CORE_DIR="./../../../open_core/"
 pushd "${OPEN_CORE_DIR}"
 
 bazel build @resim_open_core//resim/experiences/proto:experience_proto_py

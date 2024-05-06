@@ -25,13 +25,12 @@ dynamic_behavior {
         }
       }
       ilqr_drone {
-          velocity_cost: 0.05
-          initial_position: 0.0
-          initial_position: 0.0
-          initial_position: 0.0
-          goal_position: -617.0
-          goal_position: 423.0
-          goal_position: 200.0      
+        initial_position: 0
+        initial_position: 0
+        initial_position: 0
+        goal_position: -617
+        goal_position: 423
+        goal_position: 200
       }
     }
   }
@@ -487,7 +486,6 @@ geometries {
       values: 0.1
     }
     edges {
-      start: 0
       end: 1
     }
     edges {

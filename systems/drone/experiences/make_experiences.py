@@ -87,6 +87,7 @@ with open(LOCAL_EXPERIENCE_DIR / "experience.sim", "r") as  seed_file:
 
 # We create 50 experiences with a variety of goal positions
 goal_positions = [np.random.uniform(low=-500.0, high=500.0, size=2) for _ in range(50)]
+velocity_costs = [np.random.uniform(low=0.0, high=0.1) for _ in range(50)]
 
 
 s3_prefix = os.getenv("RESIM_SANDBOX_S3_PREFIX")
@@ -120,9 +121,9 @@ def push_to_bucket(client, staging_path, path, bucketname, key_prefix):
 def register_experience(id, s3_path):
     """Register an experience at the given s3_path with ReSim"""
     experience = Experience.from_dict({
-        "description": "Hello world demo experience.",
+        "description": "Simple drone demo experience.",
         "location": s3_path,
-        "name": f"Hello world experience {id}",
+        "name": f"Simple drone experience {id}",
     })
     response = create_experience.sync(client=resim_api_client,
                                       body=experience,
@@ -137,7 +138,7 @@ subprocess.call(
 
 staging_dir = tempfile.TemporaryDirectory()
 staging_path = pathlib.Path(staging_dir.name)
-for goal_position in goal_positions:
+for velocity_cost, goal_position in zip(velocity_costs, goal_positions):
     experience_id = str(uuid.uuid4())
     experience_path = staging_path / experience_id
     experience_path.mkdir()
@@ -148,6 +149,7 @@ for goal_position in goal_positions:
     for movement_model in experience.dynamic_behavior.storyboard.movement_models:
         if movement_model.HasField("ilqr_drone"):
             movement_model.ilqr_drone.goal_position[0:2] = goal_position
+            movement_model.ilqr_drone.velocity_cost = velocity_cost
 
     with open(experience_path / 'experience.sim', 'w') as f:
         f.write(str(experience))

@@ -24,7 +24,7 @@ _print() {
 
 
 LOCAL_TAG="drone_sim:latest"
-LOCAL_METRICS_TAG="drone_metrics:latest"
+LOCAL_METRICS_TAG="drone_sim_metrics:latest"
 
 _require RESIM_SANDBOX_ECR
 _require RESIM_SANDBOX_ECR_REPO
@@ -33,7 +33,7 @@ _require RESIM_SANDBOX_PROJECT
 _require RESIM_SANDBOX_SYSTEM
 
 _set_default RESIM_SANDBOX_BUILD_TAG_PREFIX "drone_sim_"
-_set_default RESIM_SANDBOX_METRICS_BUILD_TAG_PREFIX "drone_metrics_"
+_set_default RESIM_SANDBOX_METRICS_BUILD_TAG_PREFIX "drone_sim_metrics_"
 _set_default RESIM_SANDBOX_BUILD_BRANCH "drone_sandbox"
 _set_default RESIM_SANDBOX_BUILD_VERSION "$(git rev-parse HEAD)"
 _set_default RESIM_API_URL "https://api.resim.ai/v1"
@@ -79,16 +79,16 @@ resim builds create \
       --version "${RESIM_SANDBOX_BUILD_VERSION}" \
       --auto-create-branch
 
-#echo "Pushing metrics image..."
-#_FULL_METRICS_TAG="${RESIM_SANDBOX_ECR}/${RESIM_SANDBOX_ECR_REPO}:${RESIM_SANDBOX_METRICS_BUILD_TAG_PREFIX}${RESIM_SANDBOX_BUILD_VERSION}"
-#docker tag "${LOCAL_METRICS_TAG}" "${_FULL_METRICS_TAG}"
-#docker push "${_FULL_METRICS_TAG}"
-#
-#echo "Registering build with ReSim..."
-#resim metrics-builds create \
-#      --url "${RESIM_API_URL}" \
-#      --auth-url "${RESIM_AUTH_URL}" \
-#      --name "A ReSim sandbox metrics build." \
-#      --image "${_FULL_METRICS_TAG}" \
-#      --project "${RESIM_SANDBOX_PROJECT}" \
-#      --version "${RESIM_SANDBOX_BUILD_VERSION}"
+echo "Pushing metrics image..."
+_FULL_METRICS_TAG="${RESIM_SANDBOX_ECR}/${RESIM_SANDBOX_ECR_REPO}:${RESIM_SANDBOX_METRICS_BUILD_TAG_PREFIX}${RESIM_SANDBOX_BUILD_VERSION}"
+docker tag "${LOCAL_METRICS_TAG}" "${_FULL_METRICS_TAG}"
+docker push "${_FULL_METRICS_TAG}"
+
+echo "Registering build with ReSim..."
+resim metrics-builds create \
+      --url "${RESIM_API_URL}" \
+      --auth-url "${RESIM_AUTH_URL}" \
+      --name "A ReSim sandbox metrics build." \
+      --image "${_FULL_METRICS_TAG}" \
+      --project "${RESIM_SANDBOX_PROJECT}" \
+      --version "${RESIM_SANDBOX_BUILD_VERSION}"
