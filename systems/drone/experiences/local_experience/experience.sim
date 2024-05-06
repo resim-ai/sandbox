@@ -25,6 +25,7 @@ dynamic_behavior {
         }
       }
       ilqr_drone {
+        velocity_cost: 0.06
         initial_position: 0
         initial_position: 0
         initial_position: 0

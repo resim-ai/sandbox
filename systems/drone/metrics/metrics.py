@@ -131,6 +131,22 @@ def ego_metrics(writer, log):
         .with_status_data(statuses)
         .with_failure_definition(failure_def))
 
+    mean_speed = np.mean(speeds.series)
+    status = MetricStatus.PASSED_METRIC_STATUS
+    failure_def = DoubleFailureDefinition(fails_above=None, fails_below=None)
+    (
+      writer
+      .add_scalar_metric("Mean Ego Speed (m/s)")
+      .with_failure_definition(failure_def)
+      .with_value(mean_speed)
+      .with_description("Mean ego speed during the sim.")
+      .with_blocking(False)
+      .with_should_display(True)
+      .with_importance(MetricImportance.ZERO_IMPORTANCE)
+      .with_status(status)
+      .with_unit("m/s")
+    )
+
     
 def line_plot_metric_demo_2(writer):
   time = SeriesMetricsData(
@@ -272,7 +288,6 @@ def write_proto(writer):
 def maybe_batch_metrics():
     if Path("/tmp/resim/inputs/batch_metrics_config.json").is_file():
         metrics_writer = ResimMetricsWriter(uuid.uuid4()) # Make metrics writer!
-        line_plot_metric_demo(metrics_writer)
         bar_chart_metric_demo(metrics_writer)
         histogram_metric_demo(metrics_writer)
         line_plot_metric_demo_2(metrics_writer)
