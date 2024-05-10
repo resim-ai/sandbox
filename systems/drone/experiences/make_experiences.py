@@ -38,11 +38,14 @@ assert client_id is not None
 
 LOCAL_EXPERIENCE_DIR = pathlib.Path(__file__).parent / "local_experience"
 
+
 class HasNextPageToken(typing.Protocol):
     """A simple protocol for classes having the next_page_token field"""
     next_page_token: str
 
+
 ResponseType = typing.TypeVar("ResponseType", bound=HasNextPageToken)
+
 
 def fetch_all_pages(endpoint: typing.Callable[..., ResponseType],
                     *args: typing.Any,
@@ -62,7 +65,6 @@ def fetch_all_pages(endpoint: typing.Callable[..., ResponseType],
     return responses
 
 
-
 auth_client = DeviceCodeClient(domain=auth_url, client_id=client_id)
 token = auth_client.get_jwt()["access_token"]
 
@@ -80,13 +82,16 @@ def get_project_id():
 project_id = get_project_id()
 
 
-with open(LOCAL_EXPERIENCE_DIR / "experience.sim", "r") as  seed_file:
+with open(LOCAL_EXPERIENCE_DIR / "experience.sim", "r") as seed_file:
     seed_experience = text_format.Parse(seed_file.read(), ex.Experience())
 
 
-
 # We create 50 experiences with a variety of goal positions
-goal_positions = [np.random.uniform(low=-500.0, high=500.0, size=2) for _ in range(50)]
+goal_positions = [
+    np.random.uniform(
+        low=-500.0,
+        high=500.0,
+        size=2) for _ in range(50)]
 velocity_costs = [np.random.uniform(low=0.0, high=0.2) for _ in range(50)]
 
 
@@ -155,7 +160,11 @@ for velocity_cost, goal_position in zip(velocity_costs, goal_positions):
         f.write(str(experience))
     destination = s3_prefix + experience_id + "/"
 
-    shutil.copyfile(LOCAL_EXPERIENCE_DIR / "world.glb", experience_path / "world.glb")
+    shutil.copyfile(
+        LOCAL_EXPERIENCE_DIR /
+        "world.glb",
+        experience_path /
+        "world.glb")
     s3_client = boto3.client('s3')
     push_to_bucket(
         s3_client,
