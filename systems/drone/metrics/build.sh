@@ -15,8 +15,8 @@ bazel build @resim_open_core//resim/metrics/python:metrics_writer
 bazel build @resim_open_core//resim/actor/state/proto:observable_state_proto_py
 bazel build @resim_open_core//resim/transforms/python:se3_python.so
 
-OUT_DIR="$(bazel info bazel-bin)/external/resim_open_core/"
-DEP_DIR="$(bazel info output_base)/external/resim_open_core/"
+OUT_DIR="$(bazel info bazel-bin)/external/resim_open_core~/"
+DEP_DIR="$(bazel info output_base)/external/resim_open_core~/"
 
 popd
 

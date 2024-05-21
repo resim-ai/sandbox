@@ -8,7 +8,7 @@ OUTPUTS="/tmp/resim/outputs"
 
 PYTHONPATH=/resim /apply_params.py --inputs_dir "/tmp/resim/inputs"
 
-pushd /resim/resim_run.runfiles/resim_open_core/
+pushd /resim/resim_run.runfiles/resim_open_core~/
 
 resim/simulator/resim_run \
     --config "${INPUTS}/experience.sim" \
@@ -16,7 +16,7 @@ resim/simulator/resim_run \
 
 popd
 
-pushd /resim/make_visualization_log.runfiles/resim_open_core/
+pushd /resim/make_visualization_log.runfiles/resim_open_core~/
 
 resim/visualization/log/make_visualization_log \
     --log "${OUTPUTS}/resim_log.mcap" \
