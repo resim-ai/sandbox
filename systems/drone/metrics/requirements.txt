@@ -1,0 +1,4 @@
+numpy==1.26.4
+pandas==2.2.2
+protobuf==5.26.1
+mcap==1.1.1

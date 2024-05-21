@@ -1,0 +1,39 @@
+workspace(name = "sandbox")
+
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+
+git_repository(
+    name = "resim_open_core",
+    branch = "prod/mikebauer/foo",
+    remote = "https://github.com/resim-ai/open-core.git",
+)
+
+load("@resim_open_core//:deps.bzl", "resim_core_dependencies")
+
+resim_core_dependencies()
+
+load("@resim_open_core//:transitive_deps.bzl", "resim_core_transitive_dependencies")
+
+resim_core_transitive_dependencies()
+
+load("@resim_python_deps//:requirements.bzl", resim_install_deps = "install_deps")
+
+resim_install_deps()
+
+load("@rules_python//python:repositories.bzl", "py_repositories", "python_register_toolchains")
+
+py_repositories()
+
+python_register_toolchains(
+    name = "python_3_10",
+    ignore_root_user_error = True,
+    python_version = "3.10",
+)
+
+load("@python_3_10//:defs.bzl", "interpreter")
+load("@pybind11_bazel//:python_configure.bzl", "python_configure")
+
+python_configure(
+    name = "local_config_python",
+    python_interpreter_target = interpreter,
+)
