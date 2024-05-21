@@ -8,7 +8,8 @@ from google.protobuf import text_format
 import resim.experiences.proto.experience_pb2 as Experience
 
 def apply_params(inputs_dir: pathlib.Path):
-    params_path = inputs_dir / "parameters.json")
+    print(inputs_dir)
+    params_path = inputs_dir / "parameters.json"
     if not params_path.is_file():
         return
     with open(params_path, "r") as f:
@@ -33,7 +34,7 @@ def main():
     parser.add_argument("--inputs_dir")
     args = parser.parse_args()
     assert args.inputs_dir is not None
-    apply_params(pathlib.Path(Eargs.inputs_dir))
+    apply_params(pathlib.Path(args.inputs_dir))
 
 
 if __name__ == '__main__':

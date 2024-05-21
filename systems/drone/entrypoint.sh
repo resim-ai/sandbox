@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 INPUTS="/tmp/resim/inputs"
 OUTPUTS="/tmp/resim/outputs"
 
