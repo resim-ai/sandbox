@@ -15,6 +15,7 @@ from resim.metrics.python.metrics_writer import ResimMetricsWriter
 from resim.metrics.python.metrics import (
   Timestamp,
   DoubleFailureDefinition,
+  ExternalFileMetricsData,
   SeriesMetricsData,
   GroupedMetricsData,
   HistogramBucket,
@@ -288,92 +289,42 @@ def states_over_time_metric_demo(writer):
   )
   
 def plotly_json_metrics_demo(writer):
-  json = '''{
-    "data": [
-        {
-            "uid": "babced",
-            "fill": "tonexty",
-            "mode": "none",
-            "name": "Col2",
-            "type": "scatter",
-            "x": [
-                "2000-01-01",
-                "2001-01-01",
-                "2002-01-01",
-                "2003-01-01",
-                "2004-01-01",
-                "2005-01-01",
-                "2006-01-01",
-                "2007-01-01",
-                "2008-01-01",
-                "2009-01-01",
-                "2010-01-01",
-                "2011-01-01",
-                "2012-01-01",
-                "2013-01-01",
-                "2014-01-01",
-                "2015-01-01",
-                "2016-01-01"
-            ],
-            "y": [
-                "17087182",
-                "29354370",
-                "38760373",
-                "40912332",
-                "51611646",
-                "64780617",
-                "85507314",
-                "121892559",
-                "172338726",
-                "238027855",
-                "206956723",
-                "346004403",
-                "697089489",
-                "672985183",
-                "968882453",
-                "863105652",
-                "1068513050"
-            ],
-            "fillcolor": "rgb(224, 102, 102)"
-        }
-    ],
-    "layout": {
-        "title": "Total Number of Websites",
-        "width": 800,
-        "xaxis": {
-            "type": "date",
-            "range": [
-                946702800000,
-                1451624400000
-            ],
-            "title": "Source: <a href=\"http://www.scribblrs.com/\">Scribblrs</a><br>Source: <a href=\"http://www.internetlivestats.com/total-number-of-websites/\">Internet Live Stats</a>",
-            "showgrid": false,
-            "autorange": true,
-            "tickformat": "%Y"
-        },
-        "yaxis": {
-            "type": "linear",
-            "range": [
-                0,
-                1124750578.9473684
-            ],
-            "title": "",
-            "autorange": true
-        },
-        "height": 500,
-        "autosize": false
-    },
-    "frames": []
-  }'''
-  struct_proto = Struct()
-  ParseDict(json.loads(json), struct_proto)
-  
-  # TODO: Add support for Plotly JSON when the package is released
+  with open('plotly.json', 'r') as f:
+        json_data = json.load(f)
+  struct_proto = Struct() # replace with your actual proto structure
+  # ParseDict(json_data, struct_proto)
+  status = MetricStatus.PASSED_METRIC_STATUS
+  (
+    writer
+    .add_plotly_metric("Plotly example")
+    .with_description("Some sort of thing.")
+    .with_blocking(False)
+    .with_should_display(True)
+    .with_importance(MetricImportance.HIGH_IMPORTANCE)
+    .with_status(status)
+    .with_plotly_data(struct_proto)
+  )
+  print("Added a plotly metric!")
 
 def image_metrics_demo(writer):
+  status = MetricStatus.PASSED_METRIC_STATUS
   # Copy file to /tmp/resim/outputs/thonk.gif:
   image_file_path = "thonk.gif"
   shutil.copy(image_file_path, "/tmp/resim/outputs/thonk.gif")
+  image_metrics_data = ExternalFileMetricsData(
+    name="the image",
+    filename="thonk.gif") # relative
+  (
+    writer
+    .add_image_metric("Thonk example")
+    .with_description("Largest thonk of all time")
+    .with_blocking(False)
+    .with_should_display(True)
+    .with_importance(MetricImportance.HIGH_IMPORTANCE)
+    .with_status(status)
+    .with_image_data(image_metrics_data)
+  )
+  print("Thonky McThonkFace!")
   
   
 def write_proto(writer):

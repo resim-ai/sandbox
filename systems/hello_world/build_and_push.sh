@@ -59,12 +59,13 @@ echo "Building the metrics image..."
 ./metrics/build.sh
 
 echo "Performing ECR Login..."
-aws ecr get-login-password --region "${RESIM_SANDBOX_ECR_REGION}" \
-    | docker login --username AWS --password-stdin "${RESIM_SANDBOX_ECR}"
+docker tag hello_world_metrics:latest 909785973729.dkr.ecr.us-east-1.amazonaws.com/customer-test-images:hello_world_metrics_lain
+aws ecr get-login-password --region "us-east-1" \
+    | docker login --username AWS --password-stdin "909785973729.dkr.ecr.us-east-1.amazonaws.com/customer-test-images"
 
 echo "Pushing build image..."
 _FULL_TAG="${RESIM_SANDBOX_ECR}/${RESIM_SANDBOX_ECR_REPO}:${RESIM_SANDBOX_BUILD_TAG_PREFIX}${RESIM_SANDBOX_BUILD_VERSION}"
-docker tag "${LOCAL_TAG}" "${_FULL_TAG}"
+docker tag "$AL_TAG}" "${_FULL_TAG}"
 docker push "${_FULL_TAG}"
 
 echo "Registering build with ReSim..."
