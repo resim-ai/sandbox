@@ -3,6 +3,7 @@ import json
 import numpy as np
 import typing
 import sys
+import pathlib
 import shutil
 from pathlib import Path
 from dataclasses import dataclass
@@ -22,7 +23,47 @@ from resim.metrics.python.metrics import (
   MetricStatus,
   MetricImportance
 )
- 
+
+from resim_python_client.client import AuthenticatedClient
+
+from resim_python_client.api.reports import (
+    get_report)
+
+from resim_python_client.api.batches import (
+    list_batches)
+
+
+def run_report_metrics(*,
+                      token: str,
+                      api_url: str,
+                      project_id: str,                      
+                      report_id: str,
+                      metrics_path: str) -> int:
+    """Run the report metrics and save them to the given metrics_path."""
+
+    # Fetch the jobs for this report
+    client = AuthenticatedClient(
+        base_url=api_url,
+        token=token)
+    report = get_report.sync(project_id, report_id, client=client)
+    report_name = report.name
+    
+    # Now, get the batches associated with this report
+    test_suite_id = report.test_suite_id
+    branch_id = report.branch_id
+    start_timestamp = report.start_timestamp
+    end_timestamp = report.end_timestamp
+    search_string = f"test_suite_id = \"{test_suite_id}\" AND branch_id = \"{branch_id}\" AND created_at > \"{start_timestamp}\" AND created_at < \"{end_timestamp}\""
+    print(search_string)
+    
+    # Now search for the list of batches that match the search string:
+    batches_out = list_batches.sync(project_id=project_id, search=search_string, client=client)
+    number_batches = len(batches_out.batches)
+    print("about to create a length matches metric with {number_batches}")
+    print(f"Fetched report!")
+    return number_batches
+
+
 @dataclass
 class ExperienceConfig:
     arguments: float
@@ -30,6 +71,7 @@ class ExperienceConfig:
 
 EXPERIENCE_PATH = "/tmp/resim/inputs/experience/experience.json"
 LOG_PATH = "/tmp/resim/inputs/logs/log.json"
+METRICS_PATH = "/tmp/resim/outputs/metrics.binproto"
 
 def load_experience() -> ExperienceConfig:
     with open(EXPERIENCE_PATH, "r") as f:
@@ -291,8 +333,8 @@ def states_over_time_metric_demo(writer):
 def plotly_json_metrics_demo(writer):
   with open('plotly.json', 'r') as f:
         json_data = json.load(f)
-  struct_proto = Struct() # replace with your actual proto structure
-  # ParseDict(json_data, struct_proto)
+  struct_proto = Struct()
+  ParseDict(json_data, struct_proto)
   status = MetricStatus.PASSED_METRIC_STATUS
   (
     writer
@@ -347,7 +389,44 @@ def maybe_batch_metrics():
         write_proto(metrics_writer)
         sys.exit(0)
 
+def batches_count_metrics(writer, batch_count: int) -> int :
+  failure_def = DoubleFailureDefinition(fails_above=0.1, fails_below=0)
+  (
+    writer
+    .add_scalar_metric("Total Number of Batches Ran")
+    .with_failure_definition(failure_def)
+    .with_value(batch_count)
+    .with_description("The number of batches run during the timeframe of this report.")
+    .with_blocking(False)
+    .with_should_display(True)
+    .with_importance(MetricImportance.HIGH_IMPORTANCE)
+    .with_status(MetricStatus.PASSED_METRIC_STATUS)
+  )
+def compute_report_metrics(*,
+                          report_metrics_config: pathlib.Path) -> int:
+    with open(report_metrics_config, "r", encoding='utf-8') as metrics_config_file:
+        metrics_config = json.load(metrics_config_file)
+    return run_report_metrics(token=metrics_config["authToken"],
+                      api_url=metrics_config["apiURL"],
+                      project_id=metrics_config["projectID"],
+                      report_id=metrics_config["reportID"],
+                      metrics_path=METRICS_PATH)
+    
+def maybe_report_metrics():
+    print("Checking for report metrics")
+    if Path("/tmp/resim/inputs/report_config.json").is_file():
+        metrics_writer = ResimMetricsWriter(uuid.uuid4()) # Make metrics writer!
+        number_batches = compute_report_metrics(report_metrics_config=Path("/tmp/resim/inputs/report_config.json"))
+        # TODO(iain): read the report config to get it
+        print("Did report metrics")
+        batches_count_metrics(metrics_writer, number_batches)
+        plotly_json_metrics_demo(metrics_writer)
+        image_metrics_demo(metrics_writer)
+        write_proto(metrics_writer)
+        sys.exit(0)
+ 
 def main():
+  maybe_report_metrics()
   maybe_batch_metrics()
 
   log = load_log()
