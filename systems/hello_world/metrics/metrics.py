@@ -2,6 +2,7 @@ import uuid
 import json
 import numpy as np
 import typing
+import shutil
 import sys
 from pathlib import Path
 from dataclasses import dataclass
@@ -10,6 +11,7 @@ from resim.metrics.proto.validate_metrics_proto import validate_job_metrics
 from resim.metrics.python.metrics_writer import ResimMetricsWriter
 
 from resim.metrics.python.metrics import (
+  ExternalFileMetricsData,
   Timestamp,
   DoubleFailureDefinition,
   SeriesMetricsData,
@@ -139,7 +141,7 @@ def line_plot_metric_demo(writer):
     unit='')
   (
     writer
-    .add_line_plot_metric("Angular Acceleration")
+    .add_line_plot_metric("Angular Accelerationism")
     .with_description("Angular acceleration about pitch yaw roll axes.")
     .with_blocking(False)
     .with_should_display(True)
@@ -151,7 +153,7 @@ def line_plot_metric_demo(writer):
     .append_series_data(time, accelz, "yaw")
     .append_statuses_data(status_data)
     .with_importance(MetricImportance.HIGH_IMPORTANCE)
-    .with_x_axis_name("Time")
+    .with_x_axis_name("Time for tea")
     .with_y_axis_name("Angular accel")
   )
 
@@ -284,6 +286,22 @@ def states_over_time_metric_demo(writer):
     .with_importance(MetricImportance.HIGH_IMPORTANCE)
   )
 
+def gif_metric_demo(writer):
+  shutil.copy("/data/velo_log_clip.mp4", "/tmp/resim/outputs/velo_log_clip.mp4")
+
+  METRIC_DATA = ExternalFileMetricsData(name="Clip", filename="velo_log_clip.mp4")
+  (
+    writer
+    .add_image_metric("Clip of interest")
+    .with_description("A clip from the sim at the event of interest")
+    .with_blocking(False)
+    .with_should_display(True)
+    .with_status(MetricStatus.PASSED_METRIC_STATUS)
+    .with_importance(MetricImportance.HIGH_IMPORTANCE)
+    .with_image_data(METRIC_DATA)
+  )
+  
+
 
 def write_proto(writer):
   metrics_proto = writer.write()
@@ -310,6 +328,7 @@ def main():
   experience = load_experience()
 
   metrics_writer = ResimMetricsWriter(uuid.uuid4()) # Make metrics writer!
+  gif_metric_demo(metrics_writer)
   double_summary_metric_demo(metrics_writer, experience, log)
   double_over_time_metric_demo(metrics_writer, experience, log)
   scalar_metric_demo(metrics_writer, experience, log)

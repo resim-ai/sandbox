@@ -18,9 +18,9 @@ python-dateutil==2.9.0.post0
     # via pandas
 pytz==2024.1
     # via pandas
-resim-metrics @ https://github.com/resim-ai/open-core/releases/download/v0.0.10/resim_metrics-0.0.10-py3-none-manylinux2014_x86_64.whl
+resim-metrics @ https://github.com/resim-ai/open-core/releases/download/v0.0.12/resim_metrics-0.0.12-py3-none-manylinux2014_x86_64.whl
     # via -r requirements.txt
-resim-metrics-schema @ https://github.com/resim-ai/open-core/releases/download/v0.0.10/resim_metrics_schema-0.0.10-py3-none-any.whl
+resim-metrics-schema @ https://github.com/resim-ai/open-core/releases/download/v0.0.12/resim_metrics_schema-0.0.12-py3-none-any.whl
     # via -r requirements.txt
 six==1.16.0
     # via python-dateutil
