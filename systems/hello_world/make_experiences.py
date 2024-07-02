@@ -8,6 +8,7 @@ import pathlib
 import boto3
 import typing
 import subprocess
+import datetime
 
 from resim_auth_utils.device_code_client import DeviceCodeClient
 from resim_python_client.client import AuthenticatedClient
@@ -108,9 +109,11 @@ def push_to_bucket(client, staging_path, path, bucketname, key_prefix):
 def register_experience(id, s3_path):
     """Register an experience at the given s3_path with ReSim"""
     experience = Experience.from_dict({
-        "description": "Hello world demo experience.",
+        "description": "Launch demo test experience.",
         "location": s3_path,
-        "name": f"Hello world experience {id}",
+        "name": f"Launch demo test experience {id}",
+        "creationTimestamp" : datetime.datetime.now().isoformat(),
+        "experienceID" : id
     })
     response = create_experience.sync(client=resim_api_client,
                                       body=experience,

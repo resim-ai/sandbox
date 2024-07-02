@@ -287,13 +287,13 @@ def states_over_time_metric_demo(writer):
   )
 
 def gif_metric_demo(writer):
-  shutil.copy("/data/velo_log_clip.mp4", "/tmp/resim/outputs/velo_log_clip.mp4")
+  shutil.copy("/data/detection_clip_01.gif", "/tmp/resim/outputs/detection_clip_01.gif")
 
-  METRIC_DATA = ExternalFileMetricsData(name="Clip", filename="velo_log_clip.mp4")
+  METRIC_DATA = ExternalFileMetricsData(name="Clip", filename="detection_clip_01.gif")
   (
     writer
     .add_image_metric("Clip of interest")
-    .with_description("A clip from the sim at the event of interest")
+    .with_description("A clip of intersection negotiation.")
     .with_blocking(False)
     .with_should_display(True)
     .with_status(MetricStatus.PASSED_METRIC_STATUS)
