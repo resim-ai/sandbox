@@ -141,7 +141,7 @@ def line_plot_metric_demo(writer):
     unit='')
   (
     writer
-    .add_line_plot_metric("Angular Accelerationism")
+    .add_line_plot_metric("Angular Acceleration")
     .with_description("Angular acceleration about pitch yaw roll axes.")
     .with_blocking(False)
     .with_should_display(True)
@@ -153,7 +153,7 @@ def line_plot_metric_demo(writer):
     .append_series_data(time, accelz, "yaw")
     .append_statuses_data(status_data)
     .with_importance(MetricImportance.HIGH_IMPORTANCE)
-    .with_x_axis_name("Time for tea")
+    .with_x_axis_name("Time")
     .with_y_axis_name("Angular accel")
   )
 

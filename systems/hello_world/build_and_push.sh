@@ -88,7 +88,7 @@ echo "Registering build with ReSim..."
 resim metrics-builds create \
       --url "${RESIM_API_URL}" \
       --auth-url "${RESIM_AUTH_URL}" \
-      --name "Clip metrics build." \
+      --name "A ReSim sandbox metrics build." \
       --image "${_FULL_METRICS_TAG}" \
       --project "${RESIM_SANDBOX_PROJECT}" \
       --version "${RESIM_SANDBOX_BUILD_VERSION}"
