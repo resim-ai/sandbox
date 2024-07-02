@@ -1,4 +1,4 @@
 numpy==1.26.4
 pandas==2.2.2
-https://github.com/resim-ai/open-core/releases/download/v0.0.10/resim_metrics-0.0.10-py3-none-manylinux2014_x86_64.whl
-https://github.com/resim-ai/open-core/releases/download/v0.0.10/resim_metrics_schema-0.0.10-py3-none-any.whl
+https://github.com/resim-ai/open-core/releases/download/v0.0.12/resim_metrics-0.0.12-py3-none-manylinux2014_x86_64.whl
+https://github.com/resim-ai/open-core/releases/download/v0.0.12/resim_metrics_schema-0.0.12-py3-none-any.whl

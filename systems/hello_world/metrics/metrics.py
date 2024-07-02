@@ -2,6 +2,7 @@ import uuid
 import json
 import numpy as np
 import typing
+import shutil
 import sys
 from pathlib import Path
 from dataclasses import dataclass
@@ -10,6 +11,7 @@ from resim.metrics.proto.validate_metrics_proto import validate_job_metrics
 from resim.metrics.python.metrics_writer import ResimMetricsWriter
 
 from resim.metrics.python.metrics import (
+  ExternalFileMetricsData,
   Timestamp,
   DoubleFailureDefinition,
   SeriesMetricsData,
@@ -284,6 +286,22 @@ def states_over_time_metric_demo(writer):
     .with_importance(MetricImportance.HIGH_IMPORTANCE)
   )
 
+def gif_metric_demo(writer):
+  shutil.copy("/data/detection_clip_01.gif", "/tmp/resim/outputs/detection_clip_01.gif")
+
+  METRIC_DATA = ExternalFileMetricsData(name="Clip", filename="detection_clip_01.gif")
+  (
+    writer
+    .add_image_metric("Clip of interest")
+    .with_description("A clip of intersection negotiation.")
+    .with_blocking(False)
+    .with_should_display(True)
+    .with_status(MetricStatus.PASSED_METRIC_STATUS)
+    .with_importance(MetricImportance.HIGH_IMPORTANCE)
+    .with_image_data(METRIC_DATA)
+  )
+  
+
 
 def write_proto(writer):
   metrics_proto = writer.write()
@@ -310,6 +328,7 @@ def main():
   experience = load_experience()
 
   metrics_writer = ResimMetricsWriter(uuid.uuid4()) # Make metrics writer!
+  gif_metric_demo(metrics_writer)
   double_summary_metric_demo(metrics_writer, experience, log)
   double_over_time_metric_demo(metrics_writer, experience, log)
   scalar_metric_demo(metrics_writer, experience, log)
