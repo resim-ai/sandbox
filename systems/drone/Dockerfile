@@ -5,5 +5,4 @@ ENV VELOCITY_COST_OVERRIDE=$VELOCITY_COST_OVERRIDE
 
 COPY entrypoint.sh /
 
-
 ENTRYPOINT ["/entrypoint.sh"]
