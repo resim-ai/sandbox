@@ -1,4 +1,4 @@
-FROM python:3.10
+FROM python:3.10-slim
 
 LABEL description="Demo metrics build docker image"
 
@@ -7,8 +7,5 @@ RUN pip install --no-cache-dir -r /requirements_lock.txt
 
 COPY metrics.py /
 COPY decoder_factory.py /
-COPY python_libs/ /
 
-
-ENV PYTHONPATH="/"
 CMD [ "python", "/metrics.py" ]
