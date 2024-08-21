@@ -128,8 +128,10 @@ def make_gif_metric(
 
     data = ExternalFileMetricsData(name="pose_gif_data", filename="pose.gif")
     (
-        writer.add_image_metric(name="pose_gif")
-        .with_description("Ego Pose")
+        writer.add_image_metric(name="Ego Position & Orientation")
+        .with_description(
+            'Ego Position & Orientation. For more info see the MCAP log in the "Logs" tab.'
+        )
         .with_blocking(False)
         .with_should_display(True)
         .with_status(status)
@@ -164,7 +166,7 @@ def make_gif_metric(
     data = ExternalFileMetricsData(name="top_down_gif_data", filename="top_down.gif")
     status = MetricStatus.PASSED_METRIC_STATUS
     (
-        writer.add_image_metric(name="top_down_gif")
+        writer.add_image_metric(name="Top-down Ego Position")
         .with_description("Top Down Pose")
         .with_blocking(False)
         .with_should_display(True)
