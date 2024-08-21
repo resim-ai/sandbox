@@ -230,7 +230,7 @@ def ego_metrics(writer, log):
     ][0]
     ego_goal = np.array(ego_movement_model.ilqr_drone.goal_position)
 
-    # make_gif_metric(writer, ego_geometry, poses, times, ego_goal)
+    make_gif_metric(writer, ego_geometry, poses, times, ego_goal)
 
     ego_states = ego_states[0::10]
 
