@@ -473,7 +473,7 @@ def ego_metrics(writer, log):
             (
                 writer.add_event("Arrival")
                 .with_description("Arrival at the goal by the ego")
-                .with_tags("navigation")
+                .with_tags(["navigation"])
                 .with_absolute_timestamp(timestamp)
                 .with_importance(MetricImportance.ZERO_IMPORTANCE)
                 .with_status(status)
