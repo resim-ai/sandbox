@@ -1,3 +1,10 @@
+# Copyright 2024 ReSim, Inc.
+#
+# Use of this source code is governed by an MIT-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/MIT.
+
+
 import uuid
 
 from collections import defaultdict
@@ -33,6 +40,7 @@ from resim.metrics.python.unpack_metrics import unpack_metrics
 
 
 def compute_buckets(data: SeriesMetricsData):
+    """Helper to compute histogram buckets."""
     lower_bound = 0
     upper_bound = np.max(data.series)
 
@@ -60,6 +68,10 @@ def compute_buckets(data: SeriesMetricsData):
 async def compute_batch_metrics(
     *, token: str, api_url: str, project_id: str, batch_id: str, metrics_path: str
 ) -> None:
+
+    ################################################################################
+    # FETCH JOB + JOB METRICS INFO
+    ################################################################################
     client = AuthenticatedClient(base_url=api_url, token=token)
 
     batch = await get_batch.asyncio(
@@ -93,7 +105,15 @@ async def compute_batch_metrics(
         )
         metrics_data[job_id] = unpacked_metrics.metrics_data
 
+    ################################################################################
+    # METRICS COMPUTATION
+    ################################################################################
+
     metrics_writer = ResimMetricsWriter(uuid.uuid4())  # Make metrics writer!
+
+    ################################################################################
+    # JOB STATUS BAR GRAPH
+    #
     status = MetricStatus.PASSED_METRIC_STATUS
     barnames = SeriesMetricsData(
         name="Job Statuses", series=np.array(["PASSED", "WARNING", "BLOCKING"]), unit=""
@@ -131,6 +151,9 @@ async def compute_batch_metrics(
         .with_y_axis_name("Count")
     )
 
+    ################################################################################
+    # JOB STATUS SUMMARY
+    #
     job_status_counts_data = GroupedMetricsData(
         name="job_status_counts_data",
         category_to_series={
@@ -146,9 +169,9 @@ async def compute_batch_metrics(
             for status in barnames.series
         },
     )
-    
 
-    (metrics_writer.add_double_summary_metric("Job Status Counts")
+    (
+        metrics_writer.add_double_summary_metric("Job Status Counts")
         .with_description("Number of tests per each job status")
         .with_blocking(False)
         .with_should_display(True)
@@ -158,6 +181,9 @@ async def compute_batch_metrics(
         .with_status_data(job_status_counts_status)
     )
 
+    ################################################################################
+    # ALTITUDES PLOT
+    #
     metrics_data_by_name = defaultdict(dict)
     for job_id, datas in metrics_data.items():
         for data in datas:
@@ -201,6 +227,9 @@ async def compute_batch_metrics(
         .with_plotly_data(fig.to_json())
     )
 
+    ################################################################################
+    # SPEEDS PLOT
+    #
     speeds_df = pd.DataFrame(
         [
             [time, speed, test_names[job_id]]
@@ -238,6 +267,9 @@ async def compute_batch_metrics(
         .with_plotly_data(fig.to_json())
     )
 
+    ################################################################################
+    # SPEEDS HISTOGRAM
+    #
     allspeeds = SeriesMetricsData(
         name="all_speeds", series=np.array(speeds_df["speed (m/s)"])
     )
@@ -263,6 +295,9 @@ async def compute_batch_metrics(
         .with_x_axis_name("Speed (m/s)")
     )
 
+    ################################################################################
+    # SPEEDS MEAN
+    #
     (
         metrics_writer.add_scalar_metric("mean_speed")
         .with_description("mean speed over the batch for longitudinal reporting")
