@@ -10,6 +10,7 @@ import numpy as np
 
 from resim.metrics.python.metrics import (
     SeriesMetricsData,
+    GroupedMetricsData,
     MetricImportance,
     MetricStatus,
     HistogramBucket,
@@ -93,13 +94,12 @@ async def compute_batch_metrics(
         metrics_data[job_id] = unpacked_metrics.metrics_data
 
     metrics_writer = ResimMetricsWriter(uuid.uuid4())  # Make metrics writer!
-    print(batch)
     status = MetricStatus.PASSED_METRIC_STATUS
     barnames = SeriesMetricsData(
         name="Job Statuses", series=np.array(["PASSED", "WARNING", "BLOCKING"]), unit=""
     )
     count = SeriesMetricsData(
-        name="Job Status Counts",
+        name="job_counts_data",
         series=np.array(
             [
                 batch.job_metrics_status_counts.passed,
@@ -129,6 +129,33 @@ async def compute_batch_metrics(
         .append_statuses_data(status_data)
         .with_x_axis_name("Job Statuses")
         .with_y_axis_name("Count")
+    )
+
+    job_status_counts_data = GroupedMetricsData(
+        name="job_status_counts_data",
+        category_to_series={
+            status: np.array([count])
+            for (status, count) in zip(barnames.series, count.series)
+        },
+    )
+
+    job_status_counts_status = GroupedMetricsData(
+        name="job_status_counts_status",
+        category_to_series={
+            status: np.array([MetricStatus.PASSED_METRIC_STATUS])
+            for status in barnames.series
+        },
+    )
+    
+
+    (metrics_writer.add_double_summary_metric("Job Status Counts")
+        .with_description("Number of tests per each job status")
+        .with_blocking(False)
+        .with_should_display(True)
+        .with_status(status)
+        .with_importance(MetricImportance.ZERO_IMPORTANCE)
+        .with_value_data(job_status_counts_data)
+        .with_status_data(job_status_counts_status)
     )
 
     metrics_data_by_name = defaultdict(dict)
@@ -244,6 +271,7 @@ async def compute_batch_metrics(
         .with_should_display(False)  # Don't display. Only want for reports.
         .with_blocking(False)
         .with_value(np.mean(allspeeds.series))
+        .with_unit("m")
     )
 
     write_proto(metrics_writer, "/tmp/resim/outputs/metrics.binproto")
