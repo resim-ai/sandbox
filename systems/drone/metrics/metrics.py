@@ -54,12 +54,18 @@ _TOPICS = ["/actor_states"]
 
 
 def load_experience():
+    """Load the experience proto from a file."""
     with open(EXPERIENCE_PATH, "rb") as fp:
         experience = text_format.Parse(fp.read(), Experience())
     return experience
 
 
 def update_wireframe(wireframe_collection: Line3DCollection, pose, geometry):
+    """Update a wireframe collection based on the current pose of the
+    actor and its geometry.
+
+    Used for generating gifs of the drone.
+    """
     wireframe = geometry.wireframe
 
     def mapped_point(index):
@@ -70,6 +76,7 @@ def update_wireframe(wireframe_collection: Line3DCollection, pose, geometry):
 
 
 def load_log() -> list[dict[str, typing.Any]]:
+    """Load the log from an mcap file."""
     messages = collections.defaultdict(list)
     with open(LOG_PATH, "rb") as converted_log:
         reader = mcap.reader.make_reader(
@@ -85,8 +92,7 @@ def load_log() -> list[dict[str, typing.Any]]:
 def make_gif_metric(
     writer, wireframe, poses: list[se3_python.SE3], times, goal
 ) -> None:
-    # Data: 40 random walks as (num_steps, 3) arrays
-    num_steps = 30
+    """Make a couple of gif metrics of the drone moving around."""
     trajectory = np.array([pose.translation() for pose in poses])
 
     # Attaching 3D axis to the figure
@@ -183,6 +189,10 @@ def make_gif_metric(
 
 
 def ego_metrics(writer, log):
+    """Compute the job metrics for the ego."""
+    ################################################################################
+    # EXTRACT USEFUL INFO FROM LOG + EXPERIENCE
+    #
     states_over_time = log["/actor_states"]
 
     id_to_states = collections.defaultdict(list)
@@ -227,6 +237,10 @@ def ego_metrics(writer, log):
     times = np.array([time_to_s(s.time_of_validity) for s in ego_states])
 
     poses = [se3_python.SE3.exp(s.state.ref_from_frame.algebra) for s in ego_states]
+
+    ################################################################################
+    # ALTITUDE OVER TIME PLOT
+    #
     altitudes = np.array([p.translation()[-1] for p in poses])
 
     times = SeriesMetricsData("altitude_times", series=times, unit="s")
@@ -249,6 +263,9 @@ def ego_metrics(writer, log):
         .with_y_axis_name("Altitude")
     )
 
+    ################################################################################
+    # SPEED OVER TIME PLOT
+    #
     velocities = [
         p.rotation() * np.array(s.state.d_ref_from_frame[3:])
         for p, s in zip(poses, ego_states)
@@ -274,6 +291,9 @@ def ego_metrics(writer, log):
         .with_y_axis_name("Speed")
     )
 
+    ################################################################################
+    # MAX SPEED SCALAR METRIC
+    #
     max_speed = np.max(speeds.series)
     failure_def = DoubleFailureDefinition(fails_below=None, fails_above=30.0)
 
@@ -307,6 +327,9 @@ def ego_metrics(writer, log):
         .with_failure_definition(failure_def)
     )
 
+    ################################################################################
+    # SPEED STATUS OVER TIME CHART
+    #
     timestamps = GroupedMetricsData(
         "timestamps",
         category_to_series={
@@ -350,6 +373,9 @@ def ego_metrics(writer, log):
         )
     )
 
+    ################################################################################
+    # MEAN SPEED DOUBLE SUMMARY METRIC
+    #
     mean_speed = np.mean(speeds.series)
     status = MetricStatus.PASSED_METRIC_STATUS
     failure_def = DoubleFailureDefinition(fails_above=None, fails_below=None)
@@ -367,6 +393,7 @@ def ego_metrics(writer, log):
 
 
 def write_proto(writer):
+    """Write out the binproto for our metrics"""
     metrics_proto = writer.write()
     validate_job_metrics(metrics_proto.metrics_msg)
     # Known location where the runner looks for metrics
@@ -375,6 +402,7 @@ def write_proto(writer):
 
 
 async def maybe_batch_metrics():
+    """Run batch metrics if the config is present."""
     if BATCH_METRICS_CONFIG_PATH.is_file():
         with open(
             BATCH_METRICS_CONFIG_PATH, "r", encoding="utf-8"
@@ -399,16 +427,6 @@ async def main():
     metrics_writer = ResimMetricsWriter(uuid.uuid4())  # Make metrics writer!
     ego_metrics(metrics_writer, log)
     write_proto(metrics_writer)
-
-    # Event
-    # Arrival. Time to arrive. Distance Travelled
-
-    # States over time
-    # Overspeed, warning
-
-    # Bar chart
-    # Histogram
-    # Plotly
 
 
 if __name__ == "__main__":
