@@ -119,7 +119,7 @@ async def compute_batch_metrics(
     )
 
     (
-        metrics_writer.add_bar_chart_metric("job_statuses")
+        metrics_writer.add_bar_chart_metric("Job Statuses")
         .with_description("Job Statuses")
         .with_blocking(False)
         .with_should_display(True)
