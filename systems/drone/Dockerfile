@@ -1,14 +1,8 @@
-FROM ubuntu:jammy
+FROM 909785973729.dkr.ecr.us-east-1.amazonaws.com/drone-simulator:0de4571c4816b18d3f2d917a3be84d7d3b7fb182
 
-RUN apt update && apt -y upgrade
-RUN apt -y install uuid-dev python3 python3-pip
+ARG VELOCITY_COST_OVERRIDE
+ENV VELOCITY_COST_OVERRIDE=$VELOCITY_COST_OVERRIDE
 
-ARG RESIM_RUN_RUNFILES_DIR
-
-COPY bin/ /resim/
 COPY entrypoint.sh /
-COPY apply_params.py /
-
-RUN pip3 install protobuf
 
 ENTRYPOINT ["/entrypoint.sh"]

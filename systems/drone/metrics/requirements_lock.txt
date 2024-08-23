@@ -15,11 +15,15 @@ numpy==1.26.4
 pandas==2.2.2
     # via -r requirements.txt
 protobuf==5.26.1
-    # via -r requirements.txt
+    # via
+    #   -r requirements.txt
+    #   resim-open-core
 python-dateutil==2.9.0.post0
     # via pandas
 pytz==2024.1
     # via pandas
+resim-open-core @ https://github.com/resim-ai/open-core/releases/download/v0.0.16/resim_open_core-0.0.16-py3-none-manylinux2014_x86_64.whl
+    # via -r requirements.txt
 six==1.16.0
     # via python-dateutil
 tzdata==2024.1
