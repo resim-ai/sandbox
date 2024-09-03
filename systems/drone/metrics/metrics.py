@@ -391,6 +391,101 @@ def ego_metrics(writer, log):
         .with_unit("m/s")
     )
 
+    ################################################################################
+    # ARRIVAL AT GOAL EVENT
+    #
+    dense_ego_states = id_to_states[ego_id]
+    ARRIVAL_THRESHOLD_M = 0.1
+
+    def pose_from_state(state):
+        return se3_python.SE3.exp(state.state.ref_from_frame.algebra)
+
+    for ii, state in enumerate(dense_ego_states):
+        frame_from_world = pose_from_state(state).inverse()
+        if np.linalg.norm(frame_from_world * ego_goal) < ARRIVAL_THRESHOLD_M:
+            timestamp = Timestamp(
+                secs=state.time_of_validity.seconds, nanos=state.time_of_validity.nanos
+            )
+
+            elapsed_time_s = time_to_s(state.time_of_validity)
+            status = MetricStatus.PASSED_METRIC_STATUS
+            failure_def = DoubleFailureDefinition(fails_above=None, fails_below=None)
+            time_to_arrive = (
+                writer.add_scalar_metric("Time to Arrive at Goal")
+                .with_failure_definition(failure_def)
+                .with_value(elapsed_time_s)
+                .with_description("How long it took to reach the goal")
+                .with_blocking(False)
+                .with_should_display(True)
+                .with_importance(MetricImportance.ZERO_IMPORTANCE)
+                .with_status(status)
+                .with_unit("s")
+                .is_event_metric()
+            )
+
+            net_distance = np.linalg.norm(
+                (frame_from_world * pose_from_state(dense_ego_states[0])).translation()
+            )
+            total_distance = np.sum(
+                [
+                    np.linalg.norm(
+                        (
+                            pose_from_state(dense_ego_states[i]).inverse()
+                            * pose_from_state(dense_ego_states[i + 1])
+                        ).translation()
+                    )
+                    for i in range(ii)
+                ]
+            )
+
+            arrival_summary = GroupedMetricsData(
+                "arrival_distances",
+                category_to_series={
+                    "Net Distance Travelled": np.array([net_distance]),
+                    "Total Distance Travelled": np.array([total_distance]),
+                },
+                unit="m",
+            )
+
+            statuses = GroupedMetricsData(
+                "arrival_distances_status",
+                category_to_series={
+                    "Net Distance Travelled": np.array([status]),
+                    "Total Distance Travelled": np.array([status]),
+                },
+            )
+
+            failure_def = DoubleFailureDefinition(fails_below=None, fails_above=None)
+
+            distance_to_arrive = (
+                writer.add_double_summary_metric(name="Distance to Arrive at Goal")
+                .with_description(
+                    "Distances (net and total) to arrive at the goal. "
+                    "Net distance is the distance from start to finish "
+                    "whereas total is the distance actually traveled by the "
+                    "drone which must be no smaller than the net distance."
+                )
+                .with_blocking(False)
+                .with_should_display(True)
+                .with_status(status)
+                .with_importance(MetricImportance.ZERO_IMPORTANCE)
+                .with_value_data(arrival_summary)
+                .with_status_data(statuses)
+                .with_failure_definition(failure_def)
+                .is_event_metric()
+            )
+
+            (
+                writer.add_event("Arrival")
+                .with_description("Arrival at the goal by the ego")
+                .with_tags(["navigation"])
+                .with_absolute_timestamp(timestamp)
+                .with_importance(MetricImportance.ZERO_IMPORTANCE)
+                .with_status(status)
+                .with_metrics([time_to_arrive, distance_to_arrive])
+            )
+            break
+
 
 def write_proto(writer):
     """Write out the binproto for our metrics"""
