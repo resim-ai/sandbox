@@ -1,4 +1,3 @@
-
 from typing import Any, Type, Dict, Optional, Callable
 
 import mcap.decoder
@@ -13,13 +12,12 @@ class DecoderFactory(mcap.decoder.DecoderFactory):
 
     def __init__(self):
         self._types: Dict[str, Type[Any]] = {
-            'resim.actor.state.proto.ObservableStates': ObservableState.ObservableStates,
+            "resim.actor.state.proto.ObservableStates": ObservableState.ObservableStates,
         }
 
     def decoder_for(
-            self,
-            message_encoding: str,
-            schema: Optional[mcap_types.Schema]) -> Optional[Callable[[bytes], Any]]:
+        self, message_encoding: str, schema: Optional[mcap_types.Schema]
+    ) -> Optional[Callable[[bytes], Any]]:
         if (
             message_encoding != mcap.well_known.MessageEncoding.Protobuf
             or schema is None
@@ -34,4 +32,5 @@ class DecoderFactory(mcap.decoder.DecoderFactory):
             msg = message_type()
             msg.ParseFromString(data)
             return msg
+
         return decoder

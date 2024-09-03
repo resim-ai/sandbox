@@ -1,5 +1,10 @@
+# Copyright 2024 ReSim, Inc.
+#
+# Use of this source code is governed by an MIT-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/MIT.
 
-
+import asyncio
 import mcap.reader
 import uuid
 import json
@@ -9,6 +14,13 @@ import typing
 import sys
 from pathlib import Path
 from dataclasses import dataclass
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+from google.protobuf import text_format
+
+from batch_metrics import compute_batch_metrics
+
+from mpl_toolkits.mplot3d.art3d import Line3DCollection
 
 from resim.metrics.proto.validate_metrics_proto import validate_job_metrics
 from resim.metrics.python.metrics_writer import ResimMetricsWriter
@@ -16,64 +28,230 @@ from resim.metrics.python.metrics_writer import ResimMetricsWriter
 from resim.metrics.python.metrics import (
     Timestamp,
     DoubleFailureDefinition,
+    ExternalFileMetricsData,
     SeriesMetricsData,
     GroupedMetricsData,
     HistogramBucket,
     MetricStatus,
-    MetricImportance
+    MetricImportance,
 )
 
 from decoder_factory import DecoderFactory
 from resim.transforms.python import se3_python
 from resim.transforms.python import so3_python
 
+from resim.experiences.proto.experience_pb2 import Experience
+from resim.experiences.proto.actor_pb2 import Actor
 
-EXPERIENCE_PATH = "/tmp/resim/inputs/experience/experience.json"
+
 LOG_PATH = "/tmp/resim/inputs/logs/resim_log.mcap"
+EXPERIENCE_PATH = "/tmp/resim/inputs/experience/experience.sim"
+METRICS_PATH = "/tmp/resim/outputs/metrics.binproto"
+BATCH_METRICS_CONFIG_PATH = Path("/tmp/resim/inputs/batch_metrics_config.json")
 
 
 _TOPICS = ["/actor_states"]
 
 
+def load_experience():
+    """Load the experience proto from a file."""
+    with open(EXPERIENCE_PATH, "rb") as fp:
+        experience = text_format.Parse(fp.read(), Experience())
+    return experience
+
+
+def update_wireframe(wireframe_collection: Line3DCollection, pose, geometry):
+    """Update a wireframe collection based on the current pose of the
+    actor and its geometry.
+
+    Used for generating gifs of the drone.
+    """
+    wireframe = geometry.wireframe
+
+    def mapped_point(index):
+        return pose * np.array(wireframe.points[index].values)
+
+    segments = [(mapped_point(e.start), mapped_point(e.end)) for e in wireframe.edges]
+    wireframe_collection.set(segments=segments)
+
+
 def load_log() -> list[dict[str, typing.Any]]:
+    """Load the log from an mcap file."""
     messages = collections.defaultdict(list)
-    with open(LOG_PATH, 'rb') as converted_log:
+    with open(LOG_PATH, "rb") as converted_log:
         reader = mcap.reader.make_reader(
-            converted_log, decoder_factories=[DecoderFactory()])
+            converted_log, decoder_factories=[DecoderFactory()]
+        )
         for _, channel, _, message_proto in reader.iter_decoded_messages(
-                topics=_TOPICS):
+            topics=_TOPICS
+        ):
             messages[channel.topic].append(message_proto)
     return messages
 
 
+def make_gif_metric(
+    writer, wireframe, poses: list[se3_python.SE3], times, goal
+) -> None:
+    """Make a couple of gif metrics of the drone moving around."""
+    trajectory = np.array([pose.translation() for pose in poses])
+
+    # Attaching 3D axis to the figure
+    plt.style.use("dark_background")
+    fig = plt.figure()
+    ax = fig.add_subplot(projection="3d")
+    ax.set_proj_type("ortho")
+    ax.set_title("Ego Pose")
+    ax.set_xlabel("x (m)")
+    ax.set_ylabel("y (m)")
+    ax.set_zlabel("z (m)")
+    ax.plot(
+        [trajectory[0, 0]],
+        [trajectory[0, 1]],
+        [trajectory[0, 2]],
+        marker="o",
+        color="red",
+    )
+    to_goal = ax.plot([goal[0]], [goal[1]], [goal[2]], linestyle="--", color="green")[0]
+
+    # Create lines initially without data
+    line = ax.plot([], [], [])[0]
+    line_collection = ax.add_collection(Line3DCollection(segments=[]))
+
+    # Creating the Animation object
+    num_steps = len(poses)
+
+    def animate(i: int):
+        ax.set_title(f"Ego Pose: t {times[i]:.2f}s")
+        line.set_data_3d(trajectory[: (i + 1), :].T)
+        update_wireframe(line_collection, poses[i], wireframe)
+        size = 7.5
+        ax.set_xlim(trajectory[i, 0] - size, trajectory[i, 0] + size)
+        ax.set_ylim(trajectory[i, 1] - size, trajectory[i, 1] + size)
+        ax.set_zlim(trajectory[i, 2] - size, trajectory[i, 2] + size)
+        to_goal.set_data_3d(*([trajectory[i, j], goal[j]] for j in range(3)))
+
+    ani = animation.FuncAnimation(fig, animate, num_steps)
+    pillow_writer = animation.PillowWriter(
+        fps=10, metadata=dict(artist="Me"), bitrate=1800
+    )
+    ani.save("/tmp/resim/outputs/pose.gif", writer=pillow_writer)
+
+    status = MetricStatus.PASSED_METRIC_STATUS
+
+    data = ExternalFileMetricsData(name="pose_gif_data", filename="pose.gif")
+    (
+        writer.add_image_metric(name="Ego Position & Orientation")
+        .with_description(
+            'Ego Position & Orientation. For more info see the MCAP log in the "Logs" tab.'
+        )
+        .with_blocking(False)
+        .with_should_display(True)
+        .with_status(status)
+        .with_importance(MetricImportance.ZERO_IMPORTANCE)
+        .with_image_data(data)
+    )
+
+    fig = plt.figure()
+    ax = fig.add_subplot()
+    ax.set_aspect("equal")
+    ax.set_xlim(-750, 750)
+    ax.set_ylim(-750, 750)
+    ax.set_title("Top-down Ego Position")
+    ax.set_xlabel("x (m)")
+    ax.set_ylabel("y (m)")
+    line = ax.plot([], [])[0]
+    marker = ax.plot([trajectory[0, 0]], [trajectory[0, 1]], marker="x")[0]
+    ax.plot([trajectory[0, 0]], [trajectory[0, 1]], marker="o", color="red")
+    ax.plot([goal[0]], [goal[1]], marker="o", color="green")
+
+    def animate_map(i: int):
+        ax.set_title(f"Top-down Ego Position: t = {times[i]:.2f}s")
+        line.set_data(trajectory[: (i + 1), :2].T)
+        marker.set_data([trajectory[i, 0]], [trajectory[i, 1]])
+
+    ani = animation.FuncAnimation(fig, animate_map, num_steps)
+    pillow_writer = animation.PillowWriter(
+        fps=10, metadata=dict(artist="Me"), bitrate=1800
+    )
+    ani.save("/tmp/resim/outputs/top_down.gif", writer=pillow_writer)
+
+    data = ExternalFileMetricsData(name="top_down_gif_data", filename="top_down.gif")
+    status = MetricStatus.PASSED_METRIC_STATUS
+    (
+        writer.add_image_metric(name="Top-down Ego Position")
+        .with_description("Top Down Pose")
+        .with_blocking(False)
+        .with_should_display(True)
+        .with_status(status)
+        .with_importance(MetricImportance.ZERO_IMPORTANCE)
+        .with_image_data(data)
+    )
+
+
 def ego_metrics(writer, log):
+    """Compute the job metrics for the ego."""
+    ################################################################################
+    # EXTRACT USEFUL INFO FROM LOG + EXPERIENCE
+    #
     states_over_time = log["/actor_states"]
 
     id_to_states = collections.defaultdict(list)
     for bundle in log["/actor_states"]:
         for state in bundle.states:
             if state.is_spawned:
-                id_to_states[str(state.id)].append(state)
+                id_to_states[state.id.data].append(state)
 
-    for _, state in id_to_states.items():
-        ego_states = state
-    ego_states = ego_states[0::100]
+    experience = load_experience()
+    ego_actors = [
+        a
+        for a in experience.dynamic_behavior.actors
+        if a.actor_type == Actor.SYSTEM_UNDER_TEST
+    ]
+    ego_actor = ego_actors[0]
+    ego_id = ego_actor.id.data
+    ego_geometry = [
+        g
+        for g in experience.geometries
+        if g.id.data == ego_actor.geometries[0].geometry_id.data
+    ][0]
 
-    def time_to_s(t): return t.seconds + 1e-9 * t.nanos
+    ego_states = id_to_states[ego_id]
+    ego_states = ego_states[0::10]
+
+    def time_to_s(t):
+        return t.seconds + 1e-9 * t.nanos
+
+    poses = [se3_python.SE3.exp(s.state.ref_from_frame.algebra) for s in ego_states]
+    times = np.array([time_to_s(s.time_of_validity) for s in ego_states])
+    ego_movement_model = [
+        m
+        for m in experience.dynamic_behavior.storyboard.movement_models
+        if m.actor_reference.id.data == ego_id
+    ][0]
+    ego_goal = np.array(ego_movement_model.ilqr_drone.goal_position)
+
+    make_gif_metric(writer, ego_geometry, poses, times, ego_goal)
+
+    ego_states = ego_states[0::10]
+
     times = np.array([time_to_s(s.time_of_validity) for s in ego_states])
 
-    poses = [se3_python.SE3.exp(s.state.ref_from_frame.algebra)
-             for s in ego_states]
+    poses = [se3_python.SE3.exp(s.state.ref_from_frame.algebra) for s in ego_states]
+
+    ################################################################################
+    # ALTITUDE OVER TIME PLOT
+    #
     altitudes = np.array([p.translation()[-1] for p in poses])
 
-    times = SeriesMetricsData("altitude_times", series=times, unit='s')
-    altitudes = SeriesMetricsData("altitudes", series=altitudes, unit='m')
-    statuses = SeriesMetricsData("altitude statuses", series=np.array(
-        [MetricStatus.PASSED_METRIC_STATUS] * len(altitudes.series)))
+    times = SeriesMetricsData("altitude_times", series=times, unit="s")
+    altitudes = SeriesMetricsData("altitudes", series=altitudes, unit="m")
+    statuses = SeriesMetricsData(
+        "altitude statuses",
+        series=np.array([MetricStatus.PASSED_METRIC_STATUS] * len(altitudes.series)),
+    )
 
     (
-        writer
-        .add_line_plot_metric("Altitude over Time")
+        writer.add_line_plot_metric("Altitude over Time")
         .with_description("Ego altitude over time.")
         .with_blocking(False)
         .with_should_display(True)
@@ -85,17 +263,23 @@ def ego_metrics(writer, log):
         .with_y_axis_name("Altitude")
     )
 
-    velocities = [p.rotation() * np.array(s.state.d_ref_from_frame[3:])
-                  for p, s in zip(poses, ego_states)]
+    ################################################################################
+    # SPEED OVER TIME PLOT
+    #
+    velocities = [
+        p.rotation() * np.array(s.state.d_ref_from_frame[3:])
+        for p, s in zip(poses, ego_states)
+    ]
     speeds = np.array([np.linalg.norm(v) for v in velocities])
 
-    speeds = SeriesMetricsData("speeds", series=speeds, unit='m/s')
-    statuses = SeriesMetricsData("speed statuses", series=np.array(
-        [MetricStatus.PASSED_METRIC_STATUS] * len(speeds.series)))
+    speeds = SeriesMetricsData("speeds", series=speeds, unit="m/s")
+    statuses = SeriesMetricsData(
+        "speed statuses",
+        series=np.array([MetricStatus.PASSED_METRIC_STATUS] * len(speeds.series)),
+    )
 
     (
-        writer
-        .add_line_plot_metric("Speed over Time")
+        writer.add_line_plot_metric("Speed over Time")
         .with_description("Ego speed over time.")
         .with_blocking(False)
         .with_should_display(True)
@@ -107,29 +291,32 @@ def ego_metrics(writer, log):
         .with_y_axis_name("Speed")
     )
 
+    ################################################################################
+    # MAX SPEED SCALAR METRIC
+    #
     max_speed = np.max(speeds.series)
     failure_def = DoubleFailureDefinition(fails_below=None, fails_above=30.0)
 
-    status = MetricStatus.PASSED_METRIC_STATUS
-    if max_speed > failure_def.fails_above:
-        status = MetricStatus.FAIL_BLOCK_METRIC_STATUS
-        print(status)
-    elif max_speed > 20.0:
-        status = MetricStatus.FAIL_WARN_METRIC_STATUS
-        print(status)
+    def status_from_speed(speed):
+        status = MetricStatus.PASSED_METRIC_STATUS
+        if speed > failure_def.fails_above:
+            status = MetricStatus.FAIL_BLOCK_METRIC_STATUS
+        elif speed > 20.0:
+            status = MetricStatus.FAIL_WARN_METRIC_STATUS
+        return status
+
+    status = status_from_speed(max_speed)
 
     max_speed = GroupedMetricsData(
-        "max_speed", category_to_series={
-            "ego": np.array(
-                [max_speed])}, unit="m/s")
+        "max_speed", category_to_series={"ego": np.array([max_speed])}, unit="m/s"
+    )
 
     statuses = GroupedMetricsData(
-        "max speed status",
-        category_to_series={
-            "ego": np.array(
-                [status])})
+        "max speed status", category_to_series={"ego": np.array([status])}
+    )
 
-    (writer.add_double_summary_metric(name="Max Speed")
+    (
+        writer.add_double_summary_metric(name="Max Speed")
         .with_description("Ego maximum speed")
         .with_blocking(False)
         .with_should_display(True)
@@ -137,14 +324,63 @@ def ego_metrics(writer, log):
         .with_importance(MetricImportance.ZERO_IMPORTANCE)
         .with_value_data(max_speed)
         .with_status_data(statuses)
-        .with_failure_definition(failure_def))
+        .with_failure_definition(failure_def)
+    )
 
+    ################################################################################
+    # SPEED STATUS OVER TIME CHART
+    #
+    timestamps = GroupedMetricsData(
+        "timestamps",
+        category_to_series={
+            "ego": np.array(
+                [
+                    Timestamp(
+                        secs=s.time_of_validity.seconds, nanos=s.time_of_validity.nanos
+                    )
+                    for s in ego_states
+                ]
+            )
+        },
+    )
+    speed_states = GroupedMetricsData(
+        "speed_states",
+        category_to_series={
+            "ego": np.array([status_from_speed(s).name for s in speeds.series])
+        },
+        index_data=timestamps,
+    )
+    speed_states_status = GroupedMetricsData(
+        "speed_states_status",
+        category_to_series={
+            "ego": np.array([status_from_speed(s) for s in speeds.series])
+        },
+        index_data=timestamps,
+    )
+
+    (
+        writer.add_states_over_time_metric(name="Speed Status Over Time")
+        .with_description("Ego maximum speed")
+        .with_blocking(False)
+        .with_should_display(True)
+        .with_status(status)
+        .with_importance(MetricImportance.ZERO_IMPORTANCE)
+        .append_states_over_time_data(speed_states)
+        .append_statuses_over_time_data(speed_states_status)
+        .with_states_set({s.name for s in MetricStatus})
+        .with_failure_states(
+            {"FAIL_BLOCK_METRIC_STATUS", "FAIL_WARN_METRIC_STATUS", "NO_METRIC_STATUS"}
+        )
+    )
+
+    ################################################################################
+    # MEAN SPEED DOUBLE SUMMARY METRIC
+    #
     mean_speed = np.mean(speeds.series)
     status = MetricStatus.PASSED_METRIC_STATUS
     failure_def = DoubleFailureDefinition(fails_above=None, fails_below=None)
     (
-        writer
-        .add_scalar_metric("Mean Ego Speed (m/s)")
+        writer.add_scalar_metric("Mean Ego Speed (m/s)")
         .with_failure_definition(failure_def)
         .with_value(mean_speed)
         .with_description("Mean ego speed during the sim.")
@@ -156,183 +392,42 @@ def ego_metrics(writer, log):
     )
 
 
-def line_plot_metric_demo_2(writer):
-    time = SeriesMetricsData(
-        name='Time2',
-        series=np.linspace(0., 60., 600),
-        unit='s')
-    shared_mem = SeriesMetricsData(name='shared memory usage', series=np.array(
-        [y + np.random.normal(1, 0.05, 1)[0] for y in np.tanh(np.array([x / 30. - 1. for x in time.series]))]), unit='GB')
-    status_data = SeriesMetricsData(name="statuses0", series=np.array(
-        [MetricStatus.PASSED_METRIC_STATUS for a in time.series]), unit='')
-    (
-        writer
-        .add_line_plot_metric("Shared Memory Usage")
-        .with_description("Track the shared mem usage.")
-        .with_blocking(False)
-        .with_should_display(True)
-        .with_status(MetricStatus.PASSED_METRIC_STATUS)
-        .append_series_data(time, shared_mem, "shared memory usage.")
-        .append_statuses_data(status_data)
-        .with_importance(MetricImportance.HIGH_IMPORTANCE)
-        .with_x_axis_name("Time")
-        .with_y_axis_name("Memory used")
-    )
-
-
-def bar_chart_metric_demo(writer):
-    barnames = SeriesMetricsData(
-        name='Object classes',
-        series=np.array(["Obj 00", "Obj 01", "Obj 02", "Obj 03"]),
-        unit='')
-    precision = SeriesMetricsData(
-        name='Precision',
-        series=np.array([0.85, 0.71, 0.97, 0.99]),
-        unit='',
-        index_data=barnames)
-    recall = SeriesMetricsData(
-        name='Recall',
-        series=np.array([0.93, 0.97, 0.79, 0.69]),
-        unit='',
-        index_data=barnames)
-    status_data = SeriesMetricsData(
-        name="statuses_1",
-        series=np.array([MetricStatus.PASSED_METRIC_STATUS for a in precision.series]),
-        unit='',
-        index_data=barnames)
-    (
-        writer
-        .add_bar_chart_metric("Object detection")
-        .with_description("perception metrics on object classes")
-        .with_blocking(False)
-        .with_should_display(True)
-        .with_status(MetricStatus.PASSED_METRIC_STATUS)
-        .append_values_data(precision, "Precision")
-        .append_statuses_data(status_data)
-        .append_values_data(recall, "Recall")
-        .append_statuses_data(status_data)
-        .with_importance(MetricImportance.HIGH_IMPORTANCE)
-        .with_x_axis_name("Object types")
-        .with_y_axis_name("precision/recall")
-    )
-
-
-def histogram_metric_demo(writer):
-    error = SeriesMetricsData(
-        name='localization error',
-        series=np.random.normal(loc=0.0, scale=.15, size=600),
-        unit='m/s')
-    status_data = SeriesMetricsData(name="statuses_3", series=np.array(
-        [MetricStatus.PASSED_METRIC_STATUS for a in error.series]), unit='')
-    buckets = [
-        HistogramBucket(-0.5, -0.3),
-        HistogramBucket(-0.3, -0.1),
-        HistogramBucket(-0.1, 0.1),
-        HistogramBucket(0.1, 0.3),
-        HistogramBucket(0.3, 0.5)
-    ]
-    (
-        writer
-        .add_histogram_metric("Localization error frequency")
-        .with_description("Frequency over magnitude of localization error")
-        .with_blocking(False)
-        .with_should_display(True)
-        .with_status(MetricStatus.PASSED_METRIC_STATUS)
-        .with_values_data(error)
-        .with_statuses_data(status_data)
-        .with_buckets(buckets)
-        .with_importance(MetricImportance.HIGH_IMPORTANCE)
-        .with_lower_bound(-0.5)
-        .with_upper_bound(0.5)
-        .with_x_axis_name("localization error (m)")
-    )
-
-
-def states_over_time_metric_demo(writer):
-    float_second = np.linspace(0., 60., 240)
-    time_data = GroupedMetricsData(
-        name="sot_times", category_to_series={
-            "main": np.array(
-                [
-                    Timestamp(
-                        secs=int(
-                            np.floor(a)), nanos=int(
-                            np.floor(
-                                (a %
-                                 1) * 1E9))) for a in float_second])}, unit='s')
-    status_data = GroupedMetricsData(
-        name="statuses_4",
-        category_to_series={
-            "main": np.array(
-                [
-                    MetricStatus.PASSED_METRIC_STATUS for a in time_data.category_to_series["main"]])},
-        unit='',
-        index_data=time_data)
-    value_data = GroupedMetricsData(
-        name="states",
-        category_to_series={
-            "main": np.array(
-                50 *
-                ["stationary"] +
-                150 *
-                ["moving"] +
-                40 *
-                ["stationary"])},
-        unit='',
-        index_data=time_data)
-    states_set = {"stationary", "moving", "fault"}
-    failure_states = {"fault"}
-    series_name = "Operating mode"
-    (
-        writer
-        .add_states_over_time_metric("Operating mode")
-        .with_description("Operating modes over time")
-        .with_blocking(False)
-        .with_should_display(True)
-        .with_status(MetricStatus.PASSED_METRIC_STATUS)
-        .with_states_over_time_data([value_data])
-        .with_statuses_over_time_data([status_data])
-        .with_states_set(states_set)
-        .with_failure_states(failure_states)
-        .with_legend_series_names(["Op mode"])
-        .with_importance(MetricImportance.HIGH_IMPORTANCE)
-    )
-
-
 def write_proto(writer):
+    """Write out the binproto for our metrics"""
     metrics_proto = writer.write()
     validate_job_metrics(metrics_proto.metrics_msg)
     # Known location where the runner looks for metrics
-    with open('/tmp/resim/outputs/metrics.binproto', 'wb') as f:
+    with open(METRICS_PATH, "wb") as f:
         f.write(metrics_proto.metrics_msg.SerializeToString())
 
 
-def maybe_batch_metrics():
-    if Path("/tmp/resim/inputs/batch_metrics_config.json").is_file():
-        metrics_writer = ResimMetricsWriter(
-            uuid.uuid4())  # Make metrics writer!
-        bar_chart_metric_demo(metrics_writer)
-        histogram_metric_demo(metrics_writer)
-        line_plot_metric_demo_2(metrics_writer)
-        states_over_time_metric_demo(metrics_writer)
-        write_proto(metrics_writer)
+async def maybe_batch_metrics():
+    """Run batch metrics if the config is present."""
+    if BATCH_METRICS_CONFIG_PATH.is_file():
+        with open(
+            BATCH_METRICS_CONFIG_PATH, "r", encoding="utf-8"
+        ) as metrics_config_file:
+            metrics_config = json.load(metrics_config_file)
+        await compute_batch_metrics(
+            token=metrics_config["authToken"],
+            api_url=metrics_config["apiURL"],
+            project_id=metrics_config["projectID"],
+            batch_id=metrics_config["batchID"],
+            metrics_path=METRICS_PATH,
+        )
+
         sys.exit(0)
 
 
-def main():
-    maybe_batch_metrics()
+async def main():
+    await maybe_batch_metrics()
 
     log = load_log()
 
     metrics_writer = ResimMetricsWriter(uuid.uuid4())  # Make metrics writer!
     ego_metrics(metrics_writer, log)
-    bar_chart_metric_demo(metrics_writer)
-    histogram_metric_demo(metrics_writer)
-    line_plot_metric_demo_2(metrics_writer)
-    states_over_time_metric_demo(metrics_writer)
-
     write_proto(metrics_writer)
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
