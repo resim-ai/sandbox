@@ -282,7 +282,7 @@ async def compute_batch_metrics(
 
     (
         metrics_writer.add_histogram_metric(name=f"Drone Speed Distribution")
-        .with_description(f"Drone speed distribution accross the batch")
+        .with_description(f"Drone speed distribution across the batch")
         .with_status(MetricStatus.PASSED_METRIC_STATUS)
         .with_importance(MetricImportance.ZERO_IMPORTANCE)
         .with_should_display(True)
