@@ -459,7 +459,12 @@ def ego_metrics(writer, log):
 
             distance_to_arrive = (
                 writer.add_double_summary_metric(name="Distance to Arrive at Goal")
-                .with_description("Distances (net and total) to arrive at the goal")
+                .with_description(
+                    "Distances (net and total) to arrive at the goal. "
+                    "Net distance is the distance from start to finish "
+                    "whereas total is the distance actually traveled by the "
+                    "drone which must be no smaller than the net distance."
+                )
                 .with_blocking(False)
                 .with_should_display(True)
                 .with_status(status)
