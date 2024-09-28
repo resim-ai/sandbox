@@ -299,7 +299,7 @@ async def compute_batch_metrics(
     # SPEEDS MEAN
     #
     (
-        metrics_writer.add_scalar_metric("mean speed")
+        metrics_writer.add_scalar_metric("Batch Mean Ego Speed")
         .with_description("mean speed over the batch for longitudinal reporting")
         .with_status(MetricStatus.PASSED_METRIC_STATUS)
         .with_importance(MetricImportance.ZERO_IMPORTANCE)
