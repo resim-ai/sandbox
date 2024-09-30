@@ -380,7 +380,7 @@ def ego_metrics(writer, log):
     status = MetricStatus.PASSED_METRIC_STATUS
     failure_def = DoubleFailureDefinition(fails_above=None, fails_below=None)
     (
-        writer.add_scalar_metric("Mean Ego Speed (m/s)")
+        writer.add_scalar_metric("Mean Ego Speed")
         .with_failure_definition(failure_def)
         .with_value(mean_speed)
         .with_description("Mean ego speed during the sim.")

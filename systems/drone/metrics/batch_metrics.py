@@ -299,14 +299,14 @@ async def compute_batch_metrics(
     # SPEEDS MEAN
     #
     (
-        metrics_writer.add_scalar_metric("mean_speed")
+        metrics_writer.add_scalar_metric("Batch Mean Ego Speed")
         .with_description("mean speed over the batch for longitudinal reporting")
         .with_status(MetricStatus.PASSED_METRIC_STATUS)
         .with_importance(MetricImportance.ZERO_IMPORTANCE)
         .with_should_display(False)  # Don't display. Only want for reports.
         .with_blocking(False)
         .with_value(np.mean(allspeeds.series))
-        .with_unit("m")
+        .with_unit("m/s")
     )
 
     write_proto(metrics_writer, "/tmp/resim/outputs/metrics.binproto")
