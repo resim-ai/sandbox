@@ -1,5 +1,6 @@
+import argparse
 
-
+import logging
 import os
 import uuid
 import shutil
@@ -9,7 +10,6 @@ import pathlib
 import numpy as np
 import boto3
 import typing
-import subprocess
 import numpy
 
 from google.protobuf import text_format
@@ -18,160 +18,138 @@ from resim_auth_utils.device_code_client import DeviceCodeClient
 from resim_python_client.client import AuthenticatedClient
 from resim_python_client.api.experiences import create_experience
 from resim_python_client.api.projects import list_projects
-from resim_python_client.models.experience import Experience
+from resim_python_client.models import CreateExperienceInput
+from resim_python_client.api.experience_tags import add_experience_tag_to_experience
 
-
-project = os.getenv("RESIM_SANDBOX_PROJECT")
-assert project is not None, "RESIM_SANDBOX_PROJECT must be set!"
-
-api_url = os.getenv("RESIM_API_URL")
-assert api_url is not None
-
-auth_url = os.getenv("RESIM_AUTH_URL")
-assert auth_url is not None
-
-if auth_url.endswith("/"):
-    auth_url = auth_url[:-1]
-
-client_id = os.getenv("RESIM_SANDBOX_CLIENT_ID")
-assert client_id is not None
 
 LOCAL_EXPERIENCE_DIR = pathlib.Path(__file__).parent / "local_experience"
 
-
-class HasNextPageToken(typing.Protocol):
-    """A simple protocol for classes having the next_page_token field"""
-    next_page_token: str
+logger = logging.getLogger(__name__)
 
 
-ResponseType = typing.TypeVar("ResponseType", bound=HasNextPageToken)
-
-
-def fetch_all_pages(endpoint: typing.Callable[..., ResponseType],
-                    *args: typing.Any,
-                    **kwargs: typing.Any) -> list[ResponseType]:
-    """
-    Fetches all pages from a given endpoint.
-    """
-    responses = []
-    responses.append(endpoint(*args, **kwargs))
-    assert responses[-1] is not None
-
-    page_token = responses[-1].next_page_token
-    while page_token:
-        responses.append(endpoint(*args, **kwargs, page_token=page_token))
-        assert responses[-1] is not None
-        page_token = responses[-1].next_page_token
-    return responses
-
-
-auth_client = DeviceCodeClient(domain=auth_url, client_id=client_id)
-token = auth_client.get_jwt()["access_token"]
-
-resim_api_client = AuthenticatedClient(base_url=api_url,
-                                       token=token)
-
-
-def get_project_id():
-    project_id = None
-    projects = fetch_all_pages(list_projects.sync, client=resim_api_client)
-    projects = [p for page in projects for p in page.projects]
-    return next(p for p in projects if p.name == project).project_id
-
-
-project_id = get_project_id()
-
-
-with open(LOCAL_EXPERIENCE_DIR / "experience.sim", "r") as seed_file:
-    seed_experience = text_format.Parse(seed_file.read(), ex.Experience())
-
-
-# We create 50 experiences with a variety of goal positions
-goal_positions = [
-    np.random.uniform(
-        low=-500.0,
-        high=500.0,
-        size=2) for _ in range(50)]
-velocity_costs = [np.random.uniform(low=0.0, high=0.2) for _ in range(50)]
-
-
-s3_prefix = os.getenv("RESIM_SANDBOX_S3_PREFIX")
-assert s3_prefix is not None, "RESIM_SANDBOX_S3_PREFIX must be set!"
-
-project = os.getenv("RESIM_SANDBOX_PROJECT")
-assert project is not None, "RESIM_SANDBOX_PROJECT must be set!"
-
-
-assert s3_prefix.startswith("s3://")
-s3_bucket = s3_prefix.split("/")[2]
-s3_key_prefix = "/".join(s3_prefix.split("/")[3:])
-
-
-def pathlib_walk(path: pathlib.Path):
-    """Pathlib equivalent of os.path.walk()"""
-    subdirs = [d for d in path.iterdir() if d.is_dir()]
-    yield path, subdirs, [f for f in path.iterdir() if f.is_file()]
-    for d in subdirs:
-        yield from pathlib_walk(d)
-
-
-def push_to_bucket(client, staging_path, path, bucketname, key_prefix):
-    """Push the contents of of path to key_prefix / relpath(staging_path, path)"""
-    for root, dirs, files in pathlib_walk(path):
-        for f in files:
-            key = key_prefix / f.relative_to(staging_path)
-            client.upload_file(f, bucketname, str(key))
-
-
-def register_experience(id, s3_path):
+def register_experience(
+    *, experience_id, client, s3_path, project_id, id_to_location_map, experience_tag_id
+):
     """Register an experience at the given s3_path with ReSim"""
-    experience = Experience.from_dict({
-        "description": "Simple drone demo experience.",
-        "location": s3_path,
-        "name": f"Simple drone experience {id}",
-    })
-    response = create_experience.sync(client=resim_api_client,
-                                      body=experience,
-                                      project_id=project_id)
-    assert response is not None
+    experience = CreateExperienceInput(
+        description="Simple drone demo experience.",
+        location=s3_path,
+        name=f"testing2 - Simple drone experience {experience_id}",
+    )
+
+    response = create_experience.sync(
+        client=client, body=experience, project_id=project_id
+    )
+    logger.debug(response)
+    id_to_location_map[response.experience_id] = s3_path
+
+    if experience_tag_id:
+        response = add_experience_tag_to_experience.sync_detailed(
+            client=client,
+            project_id=project_id,
+            experience_id=response.experience_id,
+            experience_tag_id=experience_tag_id,
+        )
+        logger.debug(response)
 
 
-print("Make sure we have the CLI...")
-subprocess.call(
-    ["../../../scripts/maybe_install_cli.sh"],
-    cwd=pathlib.Path(__file__).parent)
+def main():
+    logging.basicConfig(level=logging.INFO)
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--auth-config-file",
+        help="JSON file describing the apiURL, authURL, and clientID to use.",
+        required=True,
+    )
+    parser.add_argument(
+        "--experience-s3-prefix",
+        help="s3 prefix to push experiences to.",
+        required=True,
+    )
+    parser.add_argument(
+        "--project-id",
+        help="project id for the project to add the experiences to.",
+        required=True,
+    )
+    parser.add_argument(
+        "--experience-tag-id",
+        help="optional experience tag to add to all experiences created",
+        default="",
+    )
 
-staging_dir = tempfile.TemporaryDirectory()
-staging_path = pathlib.Path(staging_dir.name)
-for velocity_cost, goal_position in zip(velocity_costs, goal_positions):
-    experience_id = str(uuid.uuid4())
-    experience_path = staging_path / experience_id
-    experience_path.mkdir()
+    args = parser.parse_args()
 
-    experience = ex.Experience()
-    experience.CopyFrom(seed_experience)
+    with open(args.auth_config_file, "r", encoding="utf8") as fp:
+        auth_config = json.load(fp)
 
-    for movement_model in experience.dynamic_behavior.storyboard.movement_models:
-        if movement_model.HasField("ilqr_drone"):
-            movement_model.ilqr_drone.goal_position[0:2] = goal_position
-            movement_model.ilqr_drone.velocity_cost = velocity_cost
+    logger.info("Authenticating...")
+    auth_client = DeviceCodeClient(
+        domain=auth_config["authURL"], client_id=auth_config["clientID"]
+    )
+    token = auth_client.get_jwt()["access_token"]
 
-    with open(experience_path / 'experience.sim', 'w') as f:
-        f.write(str(experience))
-    destination = s3_prefix + experience_id + "/"
+    client = AuthenticatedClient(base_url=auth_config["apiURL"], token=token)
 
-    shutil.copyfile(
-        LOCAL_EXPERIENCE_DIR /
-        "world.glb",
-        experience_path /
-        "world.glb")
-    s3_client = boto3.client('s3')
-    push_to_bucket(
-        s3_client,
-        staging_path,
-        experience_path,
-        s3_bucket,
-        s3_key_prefix)
-    s3_path = f"{s3_prefix}{experience_id}/"
-    print(s3_path)
-    register_experience(experience_id, s3_path)
+    with open(LOCAL_EXPERIENCE_DIR / "experience.sim", "r") as seed_file:
+        seed_experience = text_format.Parse(seed_file.read(), ex.Experience())
+
+    # We create 50 experiences with a variety of goal positions
+    goal_positions = [
+        np.append(
+            np.random.uniform(low=-500.0, high=500.0, size=2),
+            np.random.uniform(low=20.0, high=300.0),
+        )
+        for _ in range(200)
+    ]
+    velocity_costs = [np.random.uniform(low=0.0, high=0.2) for _ in range(200)]
+
+    s3_prefix = args.experience_s3_prefix
+    assert s3_prefix.startswith("s3://")
+    s3_bucket = s3_prefix.split("/")[2]
+    s3_key_prefix = "/".join(s3_prefix.split("/")[3:])
+
+    s3 = boto3.client("s3")
+
+    for velocity_cost, goal_position in zip(velocity_costs, goal_positions):
+        experience_id = str(uuid.uuid4())
+
+        experience = ex.Experience()
+        experience.CopyFrom(seed_experience)
+
+        for movement_model in experience.dynamic_behavior.storyboard.movement_models:
+            if movement_model.HasField("ilqr_drone"):
+                movement_model.ilqr_drone.goal_position[0:3] = goal_position
+                movement_model.ilqr_drone.velocity_cost = velocity_cost
+
+        destination = s3_prefix + experience_id + "/"
+        logger.info("Writing experience to %s", destination)
+        response = s3.put_object(
+            Body=str(experience),
+            Bucket=s3_bucket,
+            Key=f"{s3_key_prefix}{experience_id}/experience.sim",
+        )
+        logger.debug(response)
+
+        response = s3.upload_file(
+            Filename=(LOCAL_EXPERIENCE_DIR / "world.glb"),
+            Bucket=s3_bucket,
+            Key=f"{s3_key_prefix}{experience_id}/world.glb",
+        )
+        logger.debug(response)
+
+        id_to_location_map = {}
+        register_experience(
+            client=client,
+            experience_id=experience_id,
+            project_id=args.project_id,
+            s3_path=destination,
+            id_to_location_map=id_to_location_map,
+            experience_tag_id=args.experience_tag_id,
+        )
+
+        with open("id_to_location_map.json", "w", encoding="utf8") as fp:
+            json.dump(id_to_location_map, fp)
+
+
+if __name__ == "__main__":
+    main()
