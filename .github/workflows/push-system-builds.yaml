@@ -10,8 +10,8 @@ permissions:
   contents: read
 
 env:
-  ECR_REGISTRY: "909785973729.dkr.ecr.us-east-1.amazonaws.com"
-  ECR_REPOSITORY: "log-ingest"
+  ECR_REGISTRY: "public.ecr.aws"
+  ECR_REPOSITORY: "log-ingest-build"
 
 jobs:
   build:
