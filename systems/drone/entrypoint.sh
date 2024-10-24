@@ -11,6 +11,7 @@ if [ -f /tmp/resim/inputs/parameters.json ]; then
     # otherwise:
     else
         echo "Found a velocity cost override in the parameters.json file: $VELOCITY_COST_OVERRIDE"
+        VELOCITY_COST_OVERRIDE="--velocity_cost_override ${VELOCITY_COST_OVERRIDE}"
     fi
 fi
 
