@@ -34,6 +34,11 @@ jobs:
         with:
           registry: ${{ env.ECR_REGISTRY }}
 
+      - name: Reset AWS Environment Variables
+        run: |
+          echo "AWS_ACCESS_KEY_ID=" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=" >> $GITHUB_ENV
+          echo "AWS_SESSION_TOKEN=" >> $GITHUB_ENV
       - name: Build and Push
         uses: docker/build-push-action@v4
         with:
