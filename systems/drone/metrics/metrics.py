@@ -4,7 +4,9 @@
 # license that can be found in the LICENSE file or at
 # https://opensource.org/licenses/MIT.
 
+import argparse
 import asyncio
+from mcap.writer import Writer
 import mcap.reader
 import uuid
 import json
@@ -45,17 +47,19 @@ from resim.experiences.proto.actor_pb2 import Actor
 
 
 LOG_PATH = "/tmp/resim/inputs/logs/resim_log.mcap"
+VIS_LOG_PATH = "/tmp/resim/inputs/logs/vis.mcap"
 EXPERIENCE_PATH = "/tmp/resim/inputs/experience/experience.sim"
 METRICS_PATH = "/tmp/resim/outputs/metrics.binproto"
 BATCH_METRICS_CONFIG_PATH = Path("/tmp/resim/inputs/batch_metrics_config.json")
+OUTPUT_DIRECTORY_PATH = "/tmp/resim/outputs"
 
 
 _TOPICS = ["/actor_states"]
 
 
-def load_experience():
+def load_experience(experience_path: Path):
     """Load the experience proto from a file."""
-    with open(EXPERIENCE_PATH, "rb") as fp:
+    with open(experience_path, "rb") as fp:
         experience = text_format.Parse(fp.read(), Experience())
     return experience
 
@@ -75,10 +79,10 @@ def update_wireframe(wireframe_collection: Line3DCollection, pose, geometry):
     wireframe_collection.set(segments=segments)
 
 
-def load_log() -> list[dict[str, typing.Any]]:
+def load_log(log_path: Path) -> list[dict[str, typing.Any]]:
     """Load the log from an mcap file."""
     messages = collections.defaultdict(list)
-    with open(LOG_PATH, "rb") as converted_log:
+    with open(log_path, "rb") as converted_log:
         reader = mcap.reader.make_reader(
             converted_log, decoder_factories=[DecoderFactory()]
         )
@@ -90,8 +94,7 @@ def load_log() -> list[dict[str, typing.Any]]:
 
 
 def make_gif_metric(
-    writer, wireframe, poses: list[se3_python.SE3], times, goal
-) -> None:
+        writer, wireframe, poses: list[se3_python.SE3], times, goals, output_directory_path) -> None:
     """Make a couple of gif metrics of the drone moving around."""
     trajectory = np.array([pose.translation() for pose in poses])
 
@@ -111,7 +114,7 @@ def make_gif_metric(
         marker="o",
         color="red",
     )
-    to_goal = ax.plot([goal[0]], [goal[1]], [goal[2]], linestyle="--", color="green")[0]
+    #to_goal = ax.plot([goal[0]], [goal[1]], [goal[2]], linestyle="--", color="green")[0]
 
     # Create lines initially without data
     line = ax.plot([], [], [])[0]
@@ -128,13 +131,13 @@ def make_gif_metric(
         ax.set_xlim(trajectory[i, 0] - size, trajectory[i, 0] + size)
         ax.set_ylim(trajectory[i, 1] - size, trajectory[i, 1] + size)
         ax.set_zlim(trajectory[i, 2] - size, trajectory[i, 2] + size)
-        to_goal.set_data_3d(*([trajectory[i, j], goal[j]] for j in range(3)))
+        #to_goal.set_data_3d(*([trajectory[i, j], goal[j]] for j in range(3)))
 
     ani = animation.FuncAnimation(fig, animate, num_steps)
     pillow_writer = animation.PillowWriter(
         fps=10, metadata=dict(artist="Me"), bitrate=1800
     )
-    ani.save("/tmp/resim/outputs/pose.gif", writer=pillow_writer)
+    ani.save(output_directory_path / "pose.gif", writer=pillow_writer)
 
     status = MetricStatus.PASSED_METRIC_STATUS
 
@@ -162,7 +165,8 @@ def make_gif_metric(
     line = ax.plot([], [])[0]
     marker = ax.plot([trajectory[0, 0]], [trajectory[0, 1]], marker="x")[0]
     ax.plot([trajectory[0, 0]], [trajectory[0, 1]], marker="o", color="red")
-    ax.plot([goal[0]], [goal[1]], marker="o", color="green")
+    for goal in goals:
+        ax.plot([goal.position[0]], [goal.position[1]], marker="o", color="green")
 
     def animate_map(i: int):
         ax.set_title(f"Top-down Ego Position: t = {times[i]:.2f}s")
@@ -173,7 +177,7 @@ def make_gif_metric(
     pillow_writer = animation.PillowWriter(
         fps=10, metadata=dict(artist="Me"), bitrate=1800
     )
-    ani.save("/tmp/resim/outputs/top_down.gif", writer=pillow_writer)
+    ani.save(output_directory_path / "top_down.gif", writer=pillow_writer)
 
     data = ExternalFileMetricsData(name="top_down_gif_data", filename="top_down.gif")
     status = MetricStatus.PASSED_METRIC_STATUS
@@ -188,7 +192,7 @@ def make_gif_metric(
     )
 
 
-def ego_metrics(writer, log):
+def ego_metrics(writer, log, experience, output_directory_path, arrival_times):
     """Compute the job metrics for the ego."""
     ################################################################################
     # EXTRACT USEFUL INFO FROM LOG + EXPERIENCE
@@ -200,8 +204,7 @@ def ego_metrics(writer, log):
         for state in bundle.states:
             if state.is_spawned:
                 id_to_states[state.id.data].append(state)
-
-    experience = load_experience()
+                
     ego_actors = [
         a
         for a in experience.dynamic_behavior.actors
@@ -228,9 +231,9 @@ def ego_metrics(writer, log):
         for m in experience.dynamic_behavior.storyboard.movement_models
         if m.actor_reference.id.data == ego_id
     ][0]
-    ego_goal = np.array(ego_movement_model.ilqr_drone.goal_position)
+    ego_goals = ego_movement_model.ilqr_drone.goals
 
-    make_gif_metric(writer, ego_geometry, poses, times, ego_goal)
+    #make_gif_metric(writer, ego_geometry, poses, times, ego_goals, output_directory_path)
 
     ego_states = ego_states[0::10]
 
@@ -395,104 +398,108 @@ def ego_metrics(writer, log):
     # ARRIVAL AT GOAL EVENT
     #
     dense_ego_states = id_to_states[ego_id]
-    ARRIVAL_THRESHOLD_M = 0.1
+    ARRIVAL_THRESHOLD_M = 1.0
 
     def pose_from_state(state):
         return se3_python.SE3.exp(state.state.ref_from_frame.algebra)
 
-    for ii, state in enumerate(dense_ego_states):
-        frame_from_world = pose_from_state(state).inverse()
-        if np.linalg.norm(frame_from_world * ego_goal) < ARRIVAL_THRESHOLD_M:
-            timestamp = Timestamp(
-                secs=state.time_of_validity.seconds, nanos=state.time_of_validity.nanos
-            )
-
-            elapsed_time_s = time_to_s(state.time_of_validity)
-            status = MetricStatus.PASSED_METRIC_STATUS
-            failure_def = DoubleFailureDefinition(fails_above=None, fails_below=None)
-            time_to_arrive = (
-                writer.add_scalar_metric("Time to Arrive at Goal")
-                .with_failure_definition(failure_def)
-                .with_value(elapsed_time_s)
-                .with_description("How long it took to reach the goal")
-                .with_blocking(False)
-                .with_should_display(True)
-                .with_importance(MetricImportance.ZERO_IMPORTANCE)
-                .with_status(status)
-                .with_unit("s")
-                .is_event_metric()
-            )
-
-            net_distance = np.linalg.norm(
-                (frame_from_world * pose_from_state(dense_ego_states[0])).translation()
-            )
-            total_distance = np.sum(
-                [
-                    np.linalg.norm(
-                        (
-                            pose_from_state(dense_ego_states[i]).inverse()
-                            * pose_from_state(dense_ego_states[i + 1])
-                        ).translation()
-                    )
-                    for i in range(ii)
-                ]
-            )
-
-            arrival_summary = GroupedMetricsData(
-                "arrival_distances",
-                category_to_series={
-                    "Net Distance Travelled": np.array([net_distance]),
-                    "Total Distance Travelled": np.array([total_distance]),
-                },
-                unit="m",
-            )
-
-            statuses = GroupedMetricsData(
-                "arrival_distances_status",
-                category_to_series={
-                    "Net Distance Travelled": np.array([status]),
-                    "Total Distance Travelled": np.array([status]),
-                },
-            )
-
-            failure_def = DoubleFailureDefinition(fails_below=None, fails_above=None)
-
-            distance_to_arrive = (
-                writer.add_double_summary_metric(name="Distance to Arrive at Goal")
-                .with_description(
-                    "Distances (net and total) to arrive at the goal. "
-                    "Net distance is the distance from start to finish "
-                    "whereas total is the distance actually traveled by the "
-                    "drone which must be no smaller than the net distance."
+    for goal_index, ego_goal in enumerate(ego_goals):
+        for ii, state in enumerate(dense_ego_states):
+            frame_from_world = pose_from_state(state).inverse()
+            if np.linalg.norm(frame_from_world * np.array(ego_goal.position)) < ARRIVAL_THRESHOLD_M:
+                timestamp = Timestamp(
+                    secs=state.time_of_validity.seconds, nanos=state.time_of_validity.nanos
                 )
-                .with_blocking(False)
-                .with_should_display(True)
-                .with_status(status)
-                .with_importance(MetricImportance.ZERO_IMPORTANCE)
-                .with_value_data(arrival_summary)
-                .with_status_data(statuses)
-                .with_failure_definition(failure_def)
-                .is_event_metric()
-            )
+                if (len(arrival_times) > 0 and timestamp < arrival_times[-1]):
+                    continue
+        
+                elapsed_time_s = time_to_s(state.time_of_validity)
+                status = MetricStatus.PASSED_METRIC_STATUS
+                failure_def = DoubleFailureDefinition(fails_above=None, fails_below=None)
+                time_to_arrive = (
+                    writer.add_scalar_metric(f"Time to Arrive at Goal {goal_index}")
+                    .with_failure_definition(failure_def)
+                    .with_value(elapsed_time_s)
+                    .with_description("How long it took to reach the goal")
+                    .with_blocking(False)
+                    .with_should_display(True)
+                    .with_importance(MetricImportance.ZERO_IMPORTANCE)
+                    .with_status(status)
+                    .with_unit("s")
+                    .is_event_metric()
+                )
+        
+                net_distance = np.linalg.norm(
+                    (frame_from_world * pose_from_state(dense_ego_states[0])).translation()
+                )
+                total_distance = np.sum(
+                    [
+                        np.linalg.norm(
+                            (
+                                pose_from_state(dense_ego_states[i]).inverse()
+                                * pose_from_state(dense_ego_states[i + 1])
+                            ).translation()
+                        )
+                        for i in range(ii)
+                    ]
+                )
+        
+                arrival_summary = GroupedMetricsData(
+                    f"arrival_distances_{goal_index}",
+                    category_to_series={
+                        "Net Distance Travelled": np.array([net_distance]),
+                        "Total Distance Travelled": np.array([total_distance]),
+                    },
+                    unit="m",
+                )
+        
+                statuses = GroupedMetricsData(
+                    f"arrival_distances_status_{goal_index}",
+                    category_to_series={
+                        "Net Distance Travelled": np.array([status]),
+                        "Total Distance Travelled": np.array([status]),
+                    },
+                )
+        
+                failure_def = DoubleFailureDefinition(fails_below=None, fails_above=None)
+        
+                distance_to_arrive = (
+                    writer.add_double_summary_metric(name=f"Distance to Arrive at Goal {goal_index}")
+                    .with_description(
+                        "Distances (net and total) to arrive at the goal. "
+                        "Net distance is the distance from start to finish "
+                        "whereas total is the distance actually traveled by the "
+                        "drone which must be no smaller than the net distance."
+                    )
+                    .with_blocking(False)
+                    .with_should_display(True)
+                    .with_status(status)
+                    .with_importance(MetricImportance.ZERO_IMPORTANCE)
+                    .with_value_data(arrival_summary)
+                    .with_status_data(statuses)
+                    .with_failure_definition(failure_def)
+                    .is_event_metric()
+                )
+        
+                (
+                    writer.add_event(f"Arrival {goal_index}")
+                    .with_description("Arrival at the goal by the ego")
+                    .with_tags(["navigation"])
+                    .with_absolute_timestamp(timestamp)
+                    .with_importance(MetricImportance.ZERO_IMPORTANCE)
+                    .with_status(status)
+                    .with_metrics([time_to_arrive, distance_to_arrive])
+                )
+                arrival_times.append(timestamp)
+                break
 
-            (
-                writer.add_event("Arrival")
-                .with_description("Arrival at the goal by the ego")
-                .with_tags(["navigation"])
-                .with_absolute_timestamp(timestamp)
-                .with_importance(MetricImportance.ZERO_IMPORTANCE)
-                .with_status(status)
-                .with_metrics([time_to_arrive, distance_to_arrive])
-            )
-            break
 
-
-def write_proto(writer):
+def write_proto(writer, output_directory_path: Path):
     """Write out the binproto for our metrics"""
     metrics_proto = writer.write()
     validate_job_metrics(metrics_proto.metrics_msg)
     # Known location where the runner looks for metrics
-    with open(METRICS_PATH, "wb") as f:
+    with open(output_directory_path / "metrics.binproto", "wb") as f:
         f.write(metrics_proto.metrics_msg.SerializeToString())
 
 
@@ -514,15 +521,86 @@ async def maybe_batch_metrics():
         sys.exit(0)
 
 
+
+
+
 async def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--log-path", default=LOG_PATH)
+    parser.add_argument("--vis-log-path", default=VIS_LOG_PATH)    
+    parser.add_argument("--experience-path", default=EXPERIENCE_PATH)
+    parser.add_argument("--output-directory-path", default=OUTPUT_DIRECTORY_PATH)        
+    args = parser.parse_args()
+    
     await maybe_batch_metrics()
 
-    log = load_log()
+    log = load_log(Path(args.log_path))
+    experience = load_experience(Path(args.experience_path))
 
     metrics_writer = ResimMetricsWriter(uuid.uuid4())  # Make metrics writer!
-    ego_metrics(metrics_writer, log)
-    write_proto(metrics_writer)
+    arrival_times = []
+    ego_metrics(metrics_writer, log, experience, Path(args.output_directory_path), arrival_times)
+    write_proto(metrics_writer, Path(args.output_directory_path))
 
+    with open(args.vis_log_path, "rb") as log:
+        reader = mcap.reader.make_reader(log)
+
+        times = [reader.get_summary().statistics.message_start_time]
+        times.extend([t.secs * 1000000000 + t.nanos for t in arrival_times])
+
+        geometry_topics = ["/geometries", "/world_geometry"]
+
+        messages_to_always_have = []
+
+        for ii in range(len(times) - 1):
+            lb, ub = times[ii:(ii+2)]
+            channels = {}
+            schemas = {}
+            with open(Path(args.output_directory_path) / f"snippet_{ii}.mcap", "wb") as fp:
+                writer = Writer(fp)
+                writer.start()
+                
+                for schema, channel, message in messages_to_always_have:
+                    if schema.name not in schemas:
+                        schemas[schema.name] = writer.register_schema(
+                        name=schema.name,
+                        encoding=schema.encoding,
+                        data=schema.data,
+                    )
+                    if channel.topic not in channels:
+                        channels[channel.topic] = writer.register_channel(
+                            schema_id=schemas[schema.name],
+                            topic=channel.topic,
+                            message_encoding=channel.message_encoding,
+                        )
+                    writer.add_message(
+                        channel_id=channels[channel.topic],
+                        log_time=lb,
+                        data=message.data,
+                        publish_time=message.publish_time)
+                
+                for schema, channel, message in reader.iter_messages(start_time=lb, end_time=ub):
+                    if channel.topic in geometry_topics:
+                        messages_to_always_have.append((schema, channel, message))
+                    
+                    if schema.name not in schemas:
+                        schemas[schema.name] = writer.register_schema(
+                        name=schema.name,
+                        encoding=schema.encoding,
+                        data=schema.data,
+                    )
+                    if channel.topic not in channels:
+                        channels[channel.topic] = writer.register_channel(
+                            schema_id=schemas[schema.name],
+                            topic=channel.topic,
+                            message_encoding=channel.message_encoding,
+                        )
+                    writer.add_message(
+                        channel_id=channels[channel.topic],
+                        log_time=message.log_time,
+                        data=message.data,
+                        publish_time=message.publish_time)
+                writer.finish()
 
 if __name__ == "__main__":
     asyncio.run(main())

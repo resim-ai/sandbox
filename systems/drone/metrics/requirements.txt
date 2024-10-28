@@ -2,7 +2,7 @@ numpy==1.26.4
 pandas==2.2.2
 protobuf==5.26.1
 mcap==1.1.1
-resim_open_core @ https://github.com/resim-ai/open-core/releases/download/v0.0.17/resim_open_core-0.0.17-py3-none-manylinux2014_x86_64.whl
+resim_open_core
 matplotlib==3.9.2
 attrs==24.2.0
 httpx==0.27.0
