@@ -25,19 +25,46 @@ dynamic_behavior {
         }
       }
       ilqr_drone {
-        velocity_cost: 0.06
+        velocity_cost: 0.01
         initial_position: 0
         initial_position: 0
         initial_position: 0
-        goal_position: -617
-        goal_position: 423
-        goal_position: 200
+        goals {
+          position: -100
+          position: -100
+          position: 200
+	}
+        goals {
+          position: 100
+          position: -100
+          position: 200
+	}
+        goals {
+          position: 100
+          position: 100
+          position: 200
+	}
+        goals {
+          position: -100
+          position: 100
+          position: 200
+	}
+        goals {
+          position: 0
+          position: 0
+          position: 10
+	}
+        goals {
+          position: 0
+          position: 0
+          position: 0
+	}
       }
     }
   }
   completion_criteria {
     time_limit {
-      seconds: 30
+      seconds: 120
     }
   }
 }
