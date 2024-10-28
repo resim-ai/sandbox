@@ -4,10 +4,14 @@
 #
 #    pip-compile --output-file=requirements_lock.txt requirements.txt
 #
+annotated-types==0.7.0
+    # via pydantic
 anyio==4.4.0
     # via httpx
 attrs==24.2.0
-    # via -r requirements.txt
+    # via
+    #   -r requirements.txt
+    #   openapi-python-client
 certifi==2024.7.4
     # via
     #   httpcore
@@ -15,6 +19,8 @@ certifi==2024.7.4
     #   requests
 charset-normalizer==3.3.2
     # via requests
+click==8.1.7
+    # via typer
 contourpy==1.2.1
     # via matplotlib
 cycler==0.12.1
@@ -30,20 +36,29 @@ httpcore==1.0.5
 httpx==0.27.0
     # via
     #   -r requirements.txt
+    #   openapi-python-client
     #   resim-open-core
 idna==3.7
     # via
     #   anyio
     #   httpx
     #   requests
+jinja2==3.1.4
+    # via openapi-python-client
 kiwisolver==1.4.5
     # via matplotlib
 lz4==4.3.3
     # via mcap
+markdown-it-py==3.0.0
+    # via rich
+markupsafe==3.0.2
+    # via jinja2
 matplotlib==3.9.2
     # via -r requirements.txt
 mcap==1.1.1
     # via -r requirements.txt
+mdurl==0.1.2
+    # via markdown-it-py
 numpy==1.26.4
     # via
     #   -r requirements.txt
@@ -51,6 +66,8 @@ numpy==1.26.4
     #   matplotlib
     #   pandas
     #   resim-open-core
+openapi-python-client==0.21.5
+    # via resim-open-core
 packaging==24.1
     # via
     #   matplotlib
@@ -67,13 +84,20 @@ plotly==5.23.0
     #   resim-open-core
 polling2==0.5.0
     # via resim-open-core
-protobuf==5.26.1
-    # via -r requirements.txt
+protobuf==5.28.3
+    # via resim-open-core
+pydantic==2.9.2
+    # via openapi-python-client
+pydantic-core==2.23.4
+    # via pydantic
+pygments==2.18.0
+    # via rich
 pyparsing==3.1.2
     # via matplotlib
 python-dateutil==2.9.0.post0
     # via
     #   matplotlib
+    #   openapi-python-client
     #   pandas
 pytz==2024.1
     # via pandas
@@ -81,8 +105,20 @@ requests==2.32.3
     # via
     #   -r requirements.txt
     #   resim-open-core
-resim-open-core==0.1.0
+resim-open-core @ file:///resim_open_core-0.0.0-py3-none-manylinux2014_aarch64.whl
     # via -r requirements.txt
+rich==13.9.3
+    # via typer
+ruamel-yaml==0.18.6
+    # via openapi-python-client
+ruamel-yaml-clib==0.2.12
+    # via ruamel-yaml
+ruff==0.6.9
+    # via openapi-python-client
+shellingham==1.5.4
+    # via
+    #   openapi-python-client
+    #   typer
 six==1.16.0
     # via python-dateutil
 sniffio==1.3.1
@@ -91,8 +127,16 @@ sniffio==1.3.1
     #   httpx
 tenacity==9.0.0
     # via plotly
+typer==0.12.5
+    # via openapi-python-client
 typing-extensions==4.12.2
-    # via anyio
+    # via
+    #   anyio
+    #   openapi-python-client
+    #   pydantic
+    #   pydantic-core
+    #   rich
+    #   typer
 tzdata==2024.1
     # via pandas
 urllib3==2.2.2
