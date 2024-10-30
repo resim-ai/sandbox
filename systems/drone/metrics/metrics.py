@@ -4,6 +4,7 @@
 # license that can be found in the LICENSE file or at
 # https://opensource.org/licenses/MIT.
 
+import shutil
 import argparse
 import asyncio
 from mcap.writer import Writer
@@ -540,6 +541,9 @@ async def main():
     metrics_writer = ResimMetricsWriter(uuid.uuid4())  # Make metrics writer!
     arrival_times = []
     ego_metrics(metrics_writer, log, experience, Path(args.output_directory_path), arrival_times)
+    
+    shutil.copyfile(args.log_path, Path(args.output_directory_path) / "resim_log.mcap")
+    metrics_writer.add_metrics_data(ExternalFileMetricsData("resim_log_data", filename="resim_log.mcap"))
     write_proto(metrics_writer, Path(args.output_directory_path))
 
     with open(args.vis_log_path, "rb") as log:

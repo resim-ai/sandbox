@@ -85,12 +85,12 @@ _FULL_METRICS_TAG="${RESIM_SANDBOX_ECR}/${RESIM_SANDBOX_ECR_REPO}:${RESIM_SANDBO
 docker tag "${LOCAL_METRICS_TAG}" "${_FULL_METRICS_TAG}"
 docker push "${_FULL_METRICS_TAG}"
 
-echo "Registering metrics build with ReSim..."
-resim metrics-builds create \
-      --url "${RESIM_API_URL}" \
-      --auth-url "${RESIM_AUTH_URL}" \
-      --name "A ReSim sandbox metrics build." \
-      --image "${_FULL_METRICS_TAG}" \
-      --systems "${RESIM_SANDBOX_SYSTEM}" \
-      --project "${RESIM_SANDBOX_PROJECT}" \
-      --version "${RESIM_SANDBOX_BUILD_VERSION}"
+#echo "Registering metrics build with ReSim..."
+#resim metrics-builds create \
+#      --url "${RESIM_API_URL}" \
+#      --auth-url "${RESIM_AUTH_URL}" \
+#      --name "A ReSim sandbox metrics build." \
+#      --image "${_FULL_METRICS_TAG}" \
+#      --systems "${RESIM_SANDBOX_SYSTEM}" \
+#      --project "${RESIM_SANDBOX_PROJECT}" \
+#      --version "${RESIM_SANDBOX_BUILD_VERSION}"
