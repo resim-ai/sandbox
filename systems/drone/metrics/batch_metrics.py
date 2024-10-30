@@ -340,6 +340,9 @@ async def compute_batch_metrics(
         )
         basename = experience.name
 
+        if "?" in basename:
+            continue
+
         for ii in range(len(events) - 1):
             lb = events[ii]
             ub = events[ii + 1]
