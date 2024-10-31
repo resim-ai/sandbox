@@ -344,15 +344,14 @@ async def compute_batch_metrics(
             continue
 
         for ii in range(len(events) - 1):
-            lb = events[ii]
-            ub = events[ii + 1]
+            ev = events[ii]
 
-            def convert_ts(ts: datetime):
+            def diff_ts(ts: datetime, diff: int):
                 ns = int(ts.timestamp() * 1000000000)
                 print(ns)
-                return f"{ns // 1000000000}.{ns % 1000000000}"
+                return f"{ns // 1000000000 + diff}.{ns % 1000000000}"
 
-            newname = experience.name + f"?lb={convert_ts(lb)}&ub={convert_ts(ub)}"
+            newname = experience.name + f"?lb={diff_ts(ev, -5)}&ub={diff_ts(ev, 5)}"
 
             if newname not in experiences:
                 experiences[newname] = await create_experience.asyncio(

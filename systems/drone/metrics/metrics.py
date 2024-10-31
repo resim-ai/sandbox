@@ -299,11 +299,11 @@ def ego_metrics(writer, log, experience, output_directory_path, arrival_times):
     # MAX SPEED SCALAR METRIC
     #
     max_speed = np.max(speeds.series)
-    failure_def = DoubleFailureDefinition(fails_below=None, fails_above=30.0)
+    max_speed_failure_def = DoubleFailureDefinition(fails_below=None, fails_above=30.0)
 
     def status_from_speed(speed):
         status = MetricStatus.PASSED_METRIC_STATUS
-        if speed > failure_def.fails_above:
+        if speed > max_speed_failure_def.fails_above:
             status = MetricStatus.FAIL_BLOCK_METRIC_STATUS
         elif speed > 20.0:
             status = MetricStatus.FAIL_WARN_METRIC_STATUS
@@ -328,7 +328,7 @@ def ego_metrics(writer, log, experience, output_directory_path, arrival_times):
         .with_importance(MetricImportance.ZERO_IMPORTANCE)
         .with_value_data(max_speed)
         .with_status_data(statuses)
-        .with_failure_definition(failure_def)
+        .with_failure_definition(max_speed_failure_def)
     )
 
     ################################################################################
@@ -481,7 +481,12 @@ def ego_metrics(writer, log, experience, output_directory_path, arrival_times):
                     .with_failure_definition(failure_def)
                     .is_event_metric()
                 )
-        
+
+                # replicate snippet status
+                event_snippet_speeds = [s for s, t in zip(speeds.series, times.series) if t >= (elapsed_time_s - 5) and (t <= elapsed_time_s + 5)]
+                event_snippet_max_speed = np.max(event_snippet_speeds)
+                status = status_from_speed(event_snippet_max_speed)
+
                 (
                     writer.add_event(f"Arrival {goal_index}")
                     .with_description("Arrival at the goal by the ego")
