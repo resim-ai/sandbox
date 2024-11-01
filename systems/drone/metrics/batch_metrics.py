@@ -343,7 +343,7 @@ async def compute_batch_metrics(
         if "?" in basename:
             continue
 
-        for ii in range(len(events) - 1):
+        for ii in range(len(events)):
             ev = events[ii]
 
             def diff_ts(ts: datetime, diff: int):
