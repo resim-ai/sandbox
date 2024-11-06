@@ -21,7 +21,6 @@ multiple docker containers in a single ReSim test. Some notes on this:
    [here](https://docs.resim.ai/setup/build-images/#inputs-and-outputs).
    
 In order to build and run a test run:
-
     1. Have `docker` installed and running. Make sure you've logged in so you
        can pull `hello-world:latest` and `docker:dind`.
 	   
