@@ -23,7 +23,7 @@ multiple docker containers in a single ReSim test. Some notes on this:
 In order to build and run a test run:
 
     1. Have `docker` installed and running. Make sure you've logged in so you
-       can pull hello-world:latest.
+       can pull `hello-world:latest` and `docker:dind`.
 	   
 	2. Have `uuid-runtime` installed so you can run `uuidgen` to make ad-hoc
        directories on the host system for inputs/outputs.
