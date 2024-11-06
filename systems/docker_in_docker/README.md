@@ -14,11 +14,11 @@ multiple docker containers in a single ReSim test. Some notes on this:
    app. Packing the needed data into the outer image allows ReSim to mirror all
    of the needed content and avoid this issue.
    
- - The outer image here expects mounts at /tmp/resim/inputs and
-   /tmp/resim/outputs containing the experience inputs and a path for outputs to
-   be placed respectively. This matches the behavior in the ReSim app. This
+ - The outer image here expects mounts at `/tmp/resim/inputs` and
+   `/tmp/resim/outputs` containing the experience inputs and a path for outputs
+   to be placed respectively. This matches the behavior in the ReSim app. This
    matches the docs
-   [here](https://docs.resim.ai/setup/build-images/#inputs-and-outputs)
+   [here](https://docs.resim.ai/setup/build-images/#inputs-and-outputs).
    
 In order to build and run a test run:
 
