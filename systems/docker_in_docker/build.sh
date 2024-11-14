@@ -5,10 +5,12 @@ set -e
 cd $(dirname "$0")
 
 
-IMAGE="hello-world"
-docker pull "${IMAGE}:latest"
-docker save "${IMAGE}:latest" -o "${IMAGE}.tar"
+IMAGE="nvidia/cuda:12.6.2-base-ubuntu24.04"
+ALIAS="gpu-image"
+docker pull "${IMAGE}"
+docker tag  "${IMAGE}" "${ALIAS}:latest"
+docker save "${ALIAS}:latest" -o "${ALIAS}.tar"
 
 docker build . -t docker-in-docker-test-image
 
-rm "${IMAGE}.tar"
+rm "${ALIAS}.tar"

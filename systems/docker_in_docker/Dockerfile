@@ -1,6 +1,6 @@
-FROM docker:dind
+FROM ghcr.io/ehfd/nvidia-dind:24.04
 
 COPY entrypoint.sh /
-COPY hello-world.tar /
+COPY gpu-image.tar /
 
 ENTRYPOINT ["/entrypoint.sh"]
