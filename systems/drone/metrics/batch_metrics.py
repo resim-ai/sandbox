@@ -351,6 +351,7 @@ async def compute_batch_metrics(
         .with_blocking(False)
         .with_value(np.mean(allseparations.series))
         .with_unit("m")
+        .with_tag(key="RESIM_SUMMARY", value="1")
     )
 
     write_proto(metrics_writer, "/tmp/resim/outputs/metrics.binproto")
