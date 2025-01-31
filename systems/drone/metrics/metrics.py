@@ -4,7 +4,6 @@
 # license that can be found in the LICENSE file or at
 # https://opensource.org/licenses/MIT.
 
-import argparse
 import asyncio
 import mcap.reader
 import uuid
@@ -54,9 +53,9 @@ BATCH_METRICS_CONFIG_PATH = Path("/tmp/resim/inputs/batch_metrics_config.json")
 _TOPICS = ["/actor_states"]
 
 
-def load_experience(experience_path):
+def load_experience():
     """Load the experience proto from a file."""
-    with open(experience_path, "rb") as fp:
+    with open(EXPERIENCE_PATH, "rb") as fp:
         experience = text_format.Parse(fp.read(), Experience())
     return experience
 
@@ -76,17 +75,23 @@ def update_wireframe(wireframe_collection: Line3DCollection, pose, geometry):
     wireframe_collection.set(segments=segments)
 
 
-def load_log(log_path) -> list[dict[str, typing.Any]]:
+def load_log() -> list[dict[str, typing.Any]]:
     """Load the log from an mcap file."""
     messages = collections.defaultdict(list)
-    with open(log_path, "rb") as converted_log:
-        reader = mcap.reader.make_reader(converted_log, decoder_factories=[DecoderFactory()])
-        for _, channel, _, message_proto in reader.iter_decoded_messages(topics=_TOPICS):
+    with open(LOG_PATH, "rb") as converted_log:
+        reader = mcap.reader.make_reader(
+            converted_log, decoder_factories=[DecoderFactory()]
+        )
+        for _, channel, _, message_proto in reader.iter_decoded_messages(
+            topics=_TOPICS
+        ):
             messages[channel.topic].append(message_proto)
     return messages
 
 
-def make_gif_metric(writer, wireframe, poses: list[se3_python.SE3], times, goal, out_dir) -> None:
+def make_gif_metric(
+    writer, wireframe, poses: list[se3_python.SE3], times, goal
+) -> None:
     """Make a couple of gif metrics of the drone moving around."""
     trajectory = np.array([pose.translation() for pose in poses])
 
@@ -126,8 +131,10 @@ def make_gif_metric(writer, wireframe, poses: list[se3_python.SE3], times, goal,
         to_goal.set_data_3d(*([trajectory[i, j], goal[j]] for j in range(3)))
 
     ani = animation.FuncAnimation(fig, animate, num_steps)
-    pillow_writer = animation.PillowWriter(fps=10, metadata=dict(artist="Me"), bitrate=1800)
-    ani.save(out_dir / "pose.gif", writer=pillow_writer)
+    pillow_writer = animation.PillowWriter(
+        fps=10, metadata=dict(artist="Me"), bitrate=1800
+    )
+    ani.save("/tmp/resim/outputs/pose.gif", writer=pillow_writer)
 
     status = MetricStatus.PASSED_METRIC_STATUS
 
@@ -163,7 +170,9 @@ def make_gif_metric(writer, wireframe, poses: list[se3_python.SE3], times, goal,
         marker.set_data([trajectory[i, 0]], [trajectory[i, 1]])
 
     ani = animation.FuncAnimation(fig, animate_map, num_steps)
-    pillow_writer = animation.PillowWriter(fps=10, metadata=dict(artist="Me"), bitrate=1800)
+    pillow_writer = animation.PillowWriter(
+        fps=10, metadata=dict(artist="Me"), bitrate=1800
+    )
     ani.save("/tmp/resim/outputs/top_down.gif", writer=pillow_writer)
 
     data = ExternalFileMetricsData(name="top_down_gif_data", filename="top_down.gif")
@@ -179,51 +188,7 @@ def make_gif_metric(writer, wireframe, poses: list[se3_python.SE3], times, goal,
     )
 
 
-def average_distance_metric(writer, log):
-    states_over_time = log["/actor_states"]
-
-    pose_bundles = []
-    times = []
-
-    mean_distances = []
-
-    # TODO maybe produce a 2d plot
-
-    def time_to_s(t):
-        return t.seconds + 1e-9 * t.nanos
-
-    for bundle in log["/actor_states"]:
-        distances = []
-
-        poses = [se3_python.SE3.exp(s.state.ref_from_frame.algebra) for s in bundle.states]
-        for ii in range(len(poses)):
-            for jj in range(ii + 1, len(poses)):
-                distances.append(np.linalg.norm(poses[ii].translation() - poses[jj].translation()))
-        pose_bundles.append(poses)
-
-        mean_distances.append(np.mean(distances))
-        times.append(time_to_s(bundle.states[0].time_of_validity))
-
-    failure_def = DoubleFailureDefinition(fails_below=0.1, fails_above=None)
-    (
-        writer.add_scalar_metric("Mean Distance Between Drones")
-        .with_failure_definition(failure_def)
-        .with_value(np.mean(mean_distances))
-        .with_description("Mean distance between swarm members during sim")
-        .with_blocking(False)
-        .with_should_display(True)
-        .with_importance(MetricImportance.ZERO_IMPORTANCE)
-        .with_status(MetricStatus.PASSED_METRIC_STATUS)
-        .with_unit("m")
-    )
-    separations = SeriesMetricsData("separations", series=np.array(mean_distances), unit="m")
-    times = SeriesMetricsData("separation_times", series=np.array(times), unit="s")
-
-    writer.add_metrics_data(separations)
-    writer.add_metrics_data(times)
-
-
-def ego_metrics(writer, experience, log, out_dir):
+def ego_metrics(writer, log):
     """Compute the job metrics for the ego."""
     ################################################################################
     # EXTRACT USEFUL INFO FROM LOG + EXPERIENCE
@@ -236,13 +201,18 @@ def ego_metrics(writer, experience, log, out_dir):
             if state.is_spawned:
                 id_to_states[state.id.data].append(state)
 
+    experience = load_experience()
     ego_actors = [
-        a for a in experience.dynamic_behavior.actors if a.actor_type == Actor.SYSTEM_UNDER_TEST
+        a
+        for a in experience.dynamic_behavior.actors
+        if a.actor_type == Actor.SYSTEM_UNDER_TEST
     ]
     ego_actor = ego_actors[0]
     ego_id = ego_actor.id.data
     ego_geometry = [
-        g for g in experience.geometries if g.id.data == ego_actor.geometries[0].geometry_id.data
+        g
+        for g in experience.geometries
+        if g.id.data == ego_actor.geometries[0].geometry_id.data
     ][0]
 
     ego_states = id_to_states[ego_id]
@@ -260,7 +230,7 @@ def ego_metrics(writer, experience, log, out_dir):
     ][0]
     ego_goal = np.array(ego_movement_model.ilqr_drone.goal_position)
 
-    # make_gif_metric(writer, ego_geometry, poses, times, ego_goal, out_dir)
+    make_gif_metric(writer, ego_geometry, poses, times, ego_goal)
 
     ego_states = ego_states[0::10]
 
@@ -297,7 +267,8 @@ def ego_metrics(writer, experience, log, out_dir):
     # SPEED OVER TIME PLOT
     #
     velocities = [
-        p.rotation() * np.array(s.state.d_ref_from_frame[3:]) for p, s in zip(poses, ego_states)
+        p.rotation() * np.array(s.state.d_ref_from_frame[3:])
+        for p, s in zip(poses, ego_states)
     ]
     speeds = np.array([np.linalg.norm(v) for v in velocities])
 
@@ -364,7 +335,9 @@ def ego_metrics(writer, experience, log, out_dir):
         category_to_series={
             "ego": np.array(
                 [
-                    Timestamp(secs=s.time_of_validity.seconds, nanos=s.time_of_validity.nanos)
+                    Timestamp(
+                        secs=s.time_of_validity.seconds, nanos=s.time_of_validity.nanos
+                    )
                     for s in ego_states
                 ]
             )
@@ -372,12 +345,16 @@ def ego_metrics(writer, experience, log, out_dir):
     )
     speed_states = GroupedMetricsData(
         "speed_states",
-        category_to_series={"ego": np.array([status_from_speed(s).name for s in speeds.series])},
+        category_to_series={
+            "ego": np.array([status_from_speed(s).name for s in speeds.series])
+        },
         index_data=timestamps,
     )
     speed_states_status = GroupedMetricsData(
         "speed_states_status",
-        category_to_series={"ego": np.array([status_from_speed(s) for s in speeds.series])},
+        category_to_series={
+            "ego": np.array([status_from_speed(s) for s in speeds.series])
+        },
         index_data=timestamps,
     )
 
@@ -510,19 +487,21 @@ def ego_metrics(writer, experience, log, out_dir):
             break
 
 
-def write_proto(writer, metrics_path):
+def write_proto(writer):
     """Write out the binproto for our metrics"""
     metrics_proto = writer.write()
     validate_job_metrics(metrics_proto.metrics_msg)
     # Known location where the runner looks for metrics
-    with open(metrics_path, "wb") as f:
+    with open(METRICS_PATH, "wb") as f:
         f.write(metrics_proto.metrics_msg.SerializeToString())
 
 
 async def maybe_batch_metrics():
     """Run batch metrics if the config is present."""
     if BATCH_METRICS_CONFIG_PATH.is_file():
-        with open(BATCH_METRICS_CONFIG_PATH, "r", encoding="utf-8") as metrics_config_file:
+        with open(
+            BATCH_METRICS_CONFIG_PATH, "r", encoding="utf-8"
+        ) as metrics_config_file:
             metrics_config = json.load(metrics_config_file)
         await compute_batch_metrics(
             token=metrics_config["authToken"],
@@ -536,35 +515,13 @@ async def maybe_batch_metrics():
 
 
 async def main():
-    parser = argparse.ArgumentParser(description="Parse file paths with kebab-style flags.")
-    parser.add_argument(
-        "--log-path",
-        default="/tmp/resim/inputs/logs/resim_log.mcap",
-        help="Path to the log file (default: /tmp/resim/inputs/logs/resim_log.mcap)",
-    )
-    parser.add_argument(
-        "--experience-path",
-        default="/tmp/resim/inputs/experience/experience.sim",
-        help="Path to the experience file (default: /tmp/resim/inputs/experience/experience.sim)",
-    )
-    parser.add_argument(
-        "--metrics-path",
-        default="/tmp/resim/outputs/metrics.binproto",
-        help="Path to the metrics file (default: /tmp/resim/outputs/metrics.binproto)",
-    )
-    args = parser.parse_args()
-
     await maybe_batch_metrics()
 
-    log = load_log(args.log_path)
-    experience = load_experience(args.experience_path)
+    log = load_log()
 
     metrics_writer = ResimMetricsWriter(uuid.uuid4())  # Make metrics writer!
-
-    out_dir = Path(args.metrics_path).parent
-    ego_metrics(metrics_writer, experience, log, out_dir)
-    average_distance_metric(metrics_writer, log)
-    write_proto(metrics_writer, args.metrics_path)
+    ego_metrics(metrics_writer, log)
+    write_proto(metrics_writer)
 
 
 if __name__ == "__main__":

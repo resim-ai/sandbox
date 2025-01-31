@@ -60,7 +60,7 @@ echo "Building the metrics build image..."
 
 
 echo "Performing ECR Login..."
-aws ecr --profile infrastructure get-login-password --region "${RESIM_SANDBOX_ECR_REGION}" \
+aws ecr get-login-password --region "${RESIM_SANDBOX_ECR_REGION}" \
     | docker login --username AWS --password-stdin "${RESIM_SANDBOX_ECR}"
 
 echo "Pushing build image..."

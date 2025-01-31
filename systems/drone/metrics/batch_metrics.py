@@ -60,7 +60,9 @@ def compute_buckets(data: SeriesMetricsData):
         frac = i / bins
         return lower_bound * (1 - frac) + upper_bound * frac
 
-    return [HistogramBucket(lower=boundary(i), upper=boundary(i + 1)) for i in range(bins)]
+    return [
+        HistogramBucket(lower=boundary(i), upper=boundary(i + 1)) for i in range(bins)
+    ]
 
 
 async def compute_batch_metrics(
@@ -72,7 +74,9 @@ async def compute_batch_metrics(
     ################################################################################
     client = AuthenticatedClient(base_url=api_url, token=token)
 
-    batch = await get_batch.asyncio(project_id=project_id, batch_id=batch_id, client=client)
+    batch = await get_batch.asyncio(
+        project_id=project_id, batch_id=batch_id, client=client
+    )
 
     job_pages = await async_fetch_all_pages(
         list_jobs.asyncio,
@@ -153,14 +157,16 @@ async def compute_batch_metrics(
     job_status_counts_data = GroupedMetricsData(
         name="job_status_counts_data",
         category_to_series={
-            status: np.array([count]) for (status, count) in zip(barnames.series, count.series)
+            status: np.array([count])
+            for (status, count) in zip(barnames.series, count.series)
         },
     )
 
     job_status_counts_status = GroupedMetricsData(
         name="job_status_counts_status",
         category_to_series={
-            status: np.array([MetricStatus.PASSED_METRIC_STATUS]) for status in barnames.series
+            status: np.array([MetricStatus.PASSED_METRIC_STATUS])
+            for status in barnames.series
         },
     )
 
@@ -264,7 +270,9 @@ async def compute_batch_metrics(
     ################################################################################
     # SPEEDS HISTOGRAM
     #
-    allspeeds = SeriesMetricsData(name="all_speeds", series=np.array(speeds_df["speed (m/s)"]))
+    allspeeds = SeriesMetricsData(
+        name="all_speeds", series=np.array(speeds_df["speed (m/s)"])
+    )
     allspeeds_statuses = SeriesMetricsData(
         name="all_speeds_statuses",
         series=np.array([MetricStatus.PASSED_METRIC_STATUS] * len(allspeeds.series)),
@@ -299,59 +307,6 @@ async def compute_batch_metrics(
         .with_blocking(False)
         .with_value(np.mean(allspeeds.series))
         .with_unit("m/s")
-    )
-
-    ################################################################################
-    # DISTANCES HISTOGRAM
-    separations_df = pd.DataFrame(
-        [
-            [time, separation, test_names[job_id]]
-            for job_id in metrics_data
-            for (time, separation) in zip(
-                metrics_data_by_name[job_id]["separation_times"].series,
-                metrics_data_by_name[job_id]["separations"].series,
-            )
-        ],
-        columns=["time (s)", "separation (m)", "test"],
-    )
-    allseparations = SeriesMetricsData(
-        name="all_saparations", series=np.array(separations_df["separation (m)"])
-    )
-    allseparations_statuses = SeriesMetricsData(
-        name="all_separations_statuses",
-        series=np.array([MetricStatus.PASSED_METRIC_STATUS] * len(allseparations.series)),
-    )
-
-    buckets = compute_buckets(allseparations)
-
-    (
-        metrics_writer.add_histogram_metric(name=f"Drone separation Distribution")
-        .with_description(f"Drone separation distribution across the batch")
-        .with_status(MetricStatus.PASSED_METRIC_STATUS)
-        .with_importance(MetricImportance.ZERO_IMPORTANCE)
-        .with_should_display(True)
-        .with_blocking(False)
-        .with_values_data(allseparations)
-        .with_statuses_data(allseparations_statuses)
-        .with_buckets(buckets)
-        .with_lower_bound(buckets[0].lower)
-        .with_upper_bound(buckets[-1].upper)
-        .with_x_axis_name("separation (m)")
-    )
-
-    ################################################################################
-    # separationS MEAN
-    #
-    (
-        metrics_writer.add_scalar_metric("Batch Mean Ego Separation")
-        .with_description("mean separation over the batch for longitudinal reporting")
-        .with_status(MetricStatus.PASSED_METRIC_STATUS)
-        .with_importance(MetricImportance.ZERO_IMPORTANCE)
-        .with_should_display(False)  # Don't display. Only want for reports.
-        .with_blocking(False)
-        .with_value(np.mean(allseparations.series))
-        .with_unit("m")
-        .with_tag(key="RESIM_SUMMARY", value="1")
     )
 
     write_proto(metrics_writer, "/tmp/resim/outputs/metrics.binproto")
