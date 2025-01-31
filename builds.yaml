@@ -1,0 +1,43 @@
+---
+project: "Lain's Playground: Sandbox V2"
+
+
+registries:
+  resim-infra:
+    account_id: "909785973729"
+    region: "us-east-1"
+    auth:
+      profile: "infrastructure"
+
+resim_app_config:
+  client_id: "gTp1Y0kOyQ7QzIo2lZm0auGM6FJZZVvy"
+  auth_url: "https://resim.us.auth0.com/"
+  api_url: "https://api.resim.ai/v1/"
+
+experience_build_configs:
+  drone_experience:
+    description: "A drone experience build"
+    repo:
+      name: "drone-simulator"
+      registry: "resim-infra"
+    version_tag_prefix: "drone_sim_"
+    system: "Drone Motion Planning System"
+    branch: auto
+    version: auto
+
+    build_command:
+      path: "systems/drone/"
+
+metrics_build_configs:
+  drone_metrics:
+    name: "A drone metrics build"
+    repo:
+      name: "drone-simulator"
+      registry: "resim-infra"
+    version_tag_prefix: "drone_sim_metrics_"
+    systems:
+      - "Drone Motion Planning System"
+    version: auto
+
+    build_command:
+      path: "systems/drone/metrics/"

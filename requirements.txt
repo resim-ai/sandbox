@@ -1,0 +1,6 @@
+docker>=7.1.0
+resim-open-core>=0.6.1
+PyYAML>=6.0.2
+boto3>=1.36.10
+GitPython>=3.1.44
+pydantic>=2.10.6
