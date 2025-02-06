@@ -9,7 +9,7 @@ import resim.experiences.proto.experience_pb2 as Experience
 
 def apply_params(inputs_dir: pathlib.Path):
     print(inputs_dir)
-    params_path = inputs_dir / "parameters.json"
+    params_path = inputs_dir.parent / "parameters.json"
     if not params_path.is_file():
         return
     with open(params_path, "r") as f:
