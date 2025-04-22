@@ -1,0 +1,8 @@
+--index-url https://download.pytorch.org/whl/cpu
+
+torch
+torchvision
+ipykernel
+matplotlib
+Pillow
+transformers
