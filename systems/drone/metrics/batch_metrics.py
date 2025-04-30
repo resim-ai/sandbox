@@ -4,7 +4,6 @@
 # license that can be found in the LICENSE file or at
 # https://opensource.org/licenses/MIT.
 
-
 import uuid
 
 from collections import defaultdict
@@ -22,7 +21,7 @@ from resim.metrics.python.metrics import (
     MetricStatus,
     HistogramBucket,
 )
-
+from datetime import datetime
 
 import plotly.express as px
 import pandas as pd
@@ -30,6 +29,10 @@ from resim.metrics.proto.validate_metrics_proto import validate_job_metrics
 from resim.metrics.python.metrics_writer import ResimMetricsWriter
 from resim.metrics.proto.metrics_pb2 import JobMetrics
 from resim_python_client.api.batches import list_jobs
+from resim_python_client.api.batches import list_events_for_job
+from resim_python_client.api.experiences import get_experience, create_experience, list_experiences
+from resim_python_client.api.experience_tags import add_experience_tag_to_experience
+from resim_python_client.models import CreateExperienceInput
 
 from resim_python_client.client import AuthenticatedClient
 from resim_python_client.api.batches import get_batch
@@ -308,6 +311,60 @@ async def compute_batch_metrics(
         .with_value(np.mean(allspeeds.series))
         .with_unit("m/s")
     )
+
+    ################################################################################
+    # SNIPPETING
+    #
+
+    experience_pages = await async_fetch_all_pages(
+        list_experiences.asyncio,
+        client=client,
+        project_id=project_id,
+    )
+    experiences = {e.name : e for page in experience_pages for e in page.experiences}
+    
+
+    for job in jobs:
+        event_pages = await async_fetch_all_pages(
+            list_events_for_job.asyncio,
+            job_id=job.job_id,
+            client=client,
+            project_id=project_id,
+            batch_id=batch_id,
+        )
+        events = [event.timestamp for page in event_pages for event in page.events]
+        events.sort()
+
+        experience = await get_experience.asyncio(
+            project_id=project_id, client=client, experience_id=job.experience_id
+        )
+        basename = experience.name
+
+        if "?" in basename:
+            continue
+
+        for ii in range(len(events)):
+            ev = events[ii]
+
+            def diff_ts(ts: datetime, diff: int):
+                ns = int(ts.timestamp() * 1000000000)
+                print(ns)
+                return f"{ns // 1000000000 + diff}.{ns % 1000000000}"
+
+            newname = experience.name + f"?lb={diff_ts(ev, -5)}&ub={diff_ts(ev, 5)}"
+
+            if newname not in experiences:
+                experiences[newname] = await create_experience.asyncio(
+                        project_id=project_id,
+                        client=client,
+                        body=CreateExperienceInput(
+                            name=newname,
+                            location=experience.location,
+                            description=experience.description,
+                        ),
+                    )
+
+            print(await add_experience_tag_to_experience.asyncio_detailed(project_id=project_id, experience_tag_id="0ef03700-eab7-4d4c-9ef6-cd8d1274151d", experience_id=experiences[newname].experience_id, client=client))
 
     write_proto(metrics_writer, "/tmp/resim/outputs/metrics.binproto")
 
