@@ -45,26 +45,72 @@ def analyze_sequence(input_csv, output_path_base, threshold):
     pd.DataFrame(evaluated_rows).to_csv(output_csv, index=False)
     print(f"✅ Saved: {output_csv}")
 
+def analyze_sequence_v2(input_csv, output_path):
+    df = pd.read_csv(input_csv)
+
+    evaluated_rows = []
+
+    for idx,row in df.iterrows():
+        img_path = row['filename']
+
+        # exit early if the file doesnt exist
+        if not os.path.isfile(img_path):
+            print("File does not  exist!")
+            exit(1)
+        
+        threshold_score = 0.01 # a small delta value
+
+        # Run the model
+        boxes, scores, labels = model.detect_objects(img_path, threshold_score)
+        print(f" Running model on image: {img_path}: detections {len(boxes)}")
+
+        # populate the results
+        model_boxes = [
+                {
+                    'class': 'Vehicle',
+                    'bbox': [round(i, 2) for i in box.tolist()],
+                    'score': round(score.item(), 3)
+                }
+                for box, score, label in zip(boxes, scores, labels)
+            ]
+
+        evaluated_rows.append({
+            'filename': row['filename'],
+            'gt_bbox': row['gt_bbox'],
+            'model_bbox': json.dumps(model_boxes)
+        })
+
+    output_csv = f"{output_path}.csv"
+    pd.DataFrame(evaluated_rows).to_csv(output_csv, index=False)
+    print(f"✅ Saved: {output_csv}")
+        
+        
+
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--test', action='store_true', help='Run model on a test image')
+    parser.add_argument('--old', action='store_true', help='Run model with separate thresholds outputs')
     args = parser.parse_args()
     if args.test:
 
         print(f"Running model on test image: {test_image_path}")
-        boxes, scores, labels = model.detect_objects(test_image_path, threshold=0.35)
+        boxes, scores, labels = model.detect_objects(test_image_path, threshold=0.0)
         for box, score, label in zip(boxes, scores, labels):
             box = [round(i, 2) for i in box.tolist()]
             print(f"Detected: bbox={box}, score={score.item():.2f}, label={label}")
         exit()
 
-    input_csv = '/tmp/resim/inputs/camera_lidar_semantic.csv'
+    input_csv = '/tmp/resim/inputs/ground_truth.csv'
     # Output folder
     output_folder = '/tmp/resim/outputs'
     os.makedirs(output_folder, exist_ok=True)
     sequence_name = os.path.splitext(os.path.basename(input_csv))[0]  # e.g., 20180807_145028
     output_path_base = os.path.join(output_folder, sequence_name)
 
-    for thresh in thresholds:
-        analyze_sequence(input_csv, output_path_base, threshold=thresh)
+    if args.old:
+        for thresh in thresholds:
+            analyze_sequence_v2(input_csv, output_path_base)
+    else:
+        analyze_sequence_v2(input_csv, output_path_base)

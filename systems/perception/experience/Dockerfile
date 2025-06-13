@@ -14,4 +14,4 @@ COPY experience_runner.py .
 RUN python experience_runner.py --test
 
 # Set entrypoint
-ENTRYPOINT ["python", "model_analyzer.py","--test"]
+ENTRYPOINT ["python", "experience_runner.py"]
