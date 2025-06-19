@@ -111,6 +111,6 @@ if __name__ == '__main__':
 
     if args.old:
         for thresh in thresholds:
-            analyze_sequence_v2(input_csv, output_path_base)
+            analyze_sequence(input_csv, output_path_base,thresh)
     else:
         analyze_sequence_v2(input_csv, output_path_base)
