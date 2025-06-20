@@ -6,8 +6,7 @@ from resim.metrics.python import metrics_writer as rmw
 
 
 
-from metric_charts import add_summary_table_metric, add_precision_recall_curve
-import numpy as np
+from metric_charts import *
 
 IOU_THRESHOLD = 0.5
 
@@ -49,7 +48,7 @@ def load_csv(csv_path: str) -> Tuple[Dict[str, List[BoundingBox]], List[Tuple[st
     return gt_dict, all_preds
 
 # --- Evaluation ---
-def match_and_score(gt_dict: Dict[str, List[BoundingBox]], all_preds: List[Tuple[str, BoundingBox]]) -> Tuple[List[int], List[int], int]:
+def match_and_score(gt_dict: Dict[str, List[BoundingBox]], all_preds: List[Tuple[str, BoundingBox]],writer: rmw.ResimMetricsWriter) -> Tuple[List[int], List[int], int]:
     all_preds.sort(key=lambda x: x[1].score or 0, reverse=True)
     tp, fp = [], []
     matched = {img: [False] * len(gt_list) for img, gt_list in gt_dict.items()}
@@ -67,6 +66,8 @@ def match_and_score(gt_dict: Dict[str, List[BoundingBox]], all_preds: List[Tuple
         else:
             tp.append(0)
             fp.append(1)
+            # when a false positive create an event
+            add_fp_image_event(writer, img)
 
     total_gt = sum(len(v) for v in gt_dict.values())
     return tp, fp, total_gt
@@ -87,7 +88,7 @@ def run_test_metrics(writer: rmw.ResimMetricsWriter):
     print("Calculating IOU and matching detections")
     
     # tp, fp are both list of binaries containing either if they were true positive or false positive
-    tp, fp, total_gt = match_and_score(gt_dict, all_preds)
+    tp, fp, total_gt = match_and_score(gt_dict, all_preds,writer)
     
     true_positives = sum(tp) # every 1 gets added
     false_positives = sum(fp)

@@ -1,13 +1,14 @@
 import plotly.graph_objects as go
 from resim.metrics.proto import metrics_pb2 as mu
 from resim.metrics.python import metrics_writer as rmw
+import resim.metrics.python.metrics_utils as muu
 from resim.metrics.python.metrics import (
   SeriesMetricsData,
   MetricStatus,
   MetricImportance
 )
 import numpy as np
-
+import uuid
 def add_precision_recall_curve(writer: rmw.ResimMetricsWriter,precision: list,recall: list):
     precision_data = SeriesMetricsData(
         name="camera_precision_data",
@@ -79,3 +80,37 @@ def add_summary_table_metric(
         .with_blocking(False)
         .with_plotly_data(fig.to_json())
     )
+    
+def add_fp_image_event(writer: rmw.ResimMetricsWriter,filename: str):
+    '''
+        This function will add the image to the required location when a false positive is
+        detected. 
+    '''
+    EVENT_TIMESTAMP = muu.Timestamp(secs=0, nanos=0)
+    # Start by creating the image metric - will need the bounding box as well
+    # hack - to get timestamp
+    writer.add_event(
+            name=f"False Positive  {uuid.uuid4().hex}"
+        ).with_description("Unmatched with ground truth or duplicate")\
+        .with_status(MetricStatus.PASSED_METRIC_STATUS)\
+        .with_importance(MetricImportance.HIGH_IMPORTANCE)\
+        .with_relative_timestamp(EVENT_TIMESTAMP)\
+        .with_metrics(
+            [
+                # metrics must have unique names
+                writer.add_text_metric(
+                    name=f"False Positive File"
+                )
+                .with_text(
+                    f"{filename}"
+                )
+                .with_description("File name")
+                .with_status(MetricStatus.PASSED_METRIC_STATUS)
+                .with_should_display(False)
+                .with_importance(MetricImportance.MEDIUM_IMPORTANCE)
+                .is_event_metric()
+            ]
+        )
+    
+    
+    pass
