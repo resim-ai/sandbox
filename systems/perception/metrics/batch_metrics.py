@@ -1,5 +1,6 @@
 import json
 import uuid
+from pathlib import Path
 from resim.metrics.fetch_job_metrics import fetch_job_metrics_by_batch
 from resim.metrics.proto.validate_metrics_proto import validate_job_metrics
 from resim.metrics.python.metrics import (MetricImportance, MetricStatus,
