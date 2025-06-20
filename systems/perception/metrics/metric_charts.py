@@ -92,6 +92,7 @@ def add_fp_image_event(writer: rmw.ResimMetricsWriter,filename: str):
     writer.add_event(
             name=f"False Positive  {uuid.uuid4().hex}"
         ).with_description("Unmatched with ground truth or duplicate")\
+        .with_tags([])\
         .with_status(MetricStatus.PASSED_METRIC_STATUS)\
         .with_importance(MetricImportance.HIGH_IMPORTANCE)\
         .with_relative_timestamp(EVENT_TIMESTAMP)\
