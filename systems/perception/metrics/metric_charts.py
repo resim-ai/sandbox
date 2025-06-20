@@ -38,6 +38,29 @@ def add_precision_recall_curve(writer: rmw.ResimMetricsWriter,precision: list,re
         .with_y_axis_name("Precision")
     )
     
+def add_scalar_metrics(writer, false_positives, true_positives,false_negatives):
+    writer.add_scalar_metric("False Positives")\
+        .with_description("False Positives in the sequence from the model")\
+        .with_importance(MetricImportance.HIGH_IMPORTANCE)\
+        .with_value(false_positives)\
+        .with_unit("")\
+        .with_status(MetricStatus.PASSED_METRIC_STATUS)
+        
+    writer.add_scalar_metric("True Positives")\
+        .with_description("True Positives in the sequence from the model")\
+        .with_importance(MetricImportance.HIGH_IMPORTANCE)\
+        .with_value(true_positives)\
+        .with_unit("")\
+        .with_status(MetricStatus.PASSED_METRIC_STATUS)
+        
+    writer.add_scalar_metric("False Negatives")\
+        .with_description("False Negatives in the sequence from the model")\
+        .with_importance(MetricImportance.HIGH_IMPORTANCE)\
+        .with_value(false_negatives)\
+        .with_unit("")\
+        .with_status(MetricStatus.PASSED_METRIC_STATUS)
+        
+    
 
 def add_summary_table_metric(
     writer: rmw.ResimMetricsWriter,

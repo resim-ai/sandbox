@@ -1,5 +1,6 @@
 from pathlib import Path
 from test_metrics import run_test_metrics
+from batch_metrics import run_batch_metrics
 import uuid
 from resim.metrics.python.metrics_writer import ResimMetricsWriter
 from resim.metrics.proto.validate_metrics_proto import validate_job_metrics
@@ -7,10 +8,6 @@ from resim.metrics.proto.validate_metrics_proto import validate_job_metrics
 BATCH_METRICS_CONFIG_PATH = Path("/tmp/resim/inputs/batch_metrics_config.json")
 METRICS_PATH = "/tmp/resim/outputs/metrics.binproto"
 
-def run_batch_metrics():
-    print("Running Batch Metrics")
-    
-    print("Finished Running Batch Metrics")
 
 def write_proto(writer):
   metrics_proto = writer.write()
@@ -36,8 +33,7 @@ def main():
     else:
         print("Running test metrics...")
         run_test_metrics(writer)
-        
-    write_proto(writer)
+        write_proto(writer)
         
 if __name__ == "__main__":
     main() 

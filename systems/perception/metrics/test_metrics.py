@@ -79,6 +79,8 @@ def compute_pr_curve(tp: List[int], fp: List[int], total_gt: int) -> Tuple[List[
     recall = tp_cum / (total_gt + 1e-8)
     return precision.tolist(), recall.tolist()
 
+
+
 # --- Main driver ---
 def run_test_metrics(writer: rmw.ResimMetricsWriter):
     csv_path = "/tmp/resim/inputs/logs/detections.csv"
@@ -97,6 +99,8 @@ def run_test_metrics(writer: rmw.ResimMetricsWriter):
     precision, recall = compute_pr_curve(tp, fp, total_gt)
     
     add_summary_table_metric(writer, len(all_preds), true_positives, false_positives, false_negatives)
+    
+    add_scalar_metrics(writer, false_positives, true_positives, false_negatives)
     
     print("Precision-Recall Curve:")
     for p, r in zip(precision, recall):
