@@ -6,7 +6,7 @@ from resim.metrics.python import metrics_writer as rmw
 
 
 
-from metric_charts import add_summary_table_metric
+from metric_charts import add_summary_table_metric, add_precision_recall_curve
 import numpy as np
 
 IOU_THRESHOLD = 0.5
@@ -102,4 +102,6 @@ def run_test_metrics(writer: rmw.ResimMetricsWriter):
         print(f"Precision: {p:.3f}, Recall: {r:.3f}")
     if precision:
         print(f"\nFinal Precision@Recall=1: {precision[-1]:.3f}")
+        
+    add_precision_recall_curve(writer,precision,recall)
     print("Finished Running Test Metrics")
