@@ -8,7 +8,7 @@ COPY requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
 # Copy source files
-COPY entrypoint.py .
+COPY *.py .
 
 # Set entrypoint
 ENTRYPOINT ["python", "entrypoint.py"]

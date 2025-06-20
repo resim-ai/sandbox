@@ -106,11 +106,14 @@ if __name__ == '__main__':
     # Output folder
     output_folder = '/tmp/resim/outputs'
     os.makedirs(output_folder, exist_ok=True)
-    sequence_name = os.path.splitext(os.path.basename(input_csv))[0]  # e.g., 20180807_145028
-    output_path_base = os.path.join(output_folder, sequence_name)
+    
+    # Name the file to write to
+    output_path_base = os.path.join(output_folder, "detections")
+    
+    print(f"Output CSV file is {output_path_base}")
 
     if args.old:
         for thresh in thresholds:
             analyze_sequence(input_csv, output_path_base,thresh)
-    else:
+    else: 
         analyze_sequence_v2(input_csv, output_path_base)
