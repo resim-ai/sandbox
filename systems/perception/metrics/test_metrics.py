@@ -4,13 +4,14 @@ import ast
 from typing import List, Dict, Tuple, Optional
 from resim.metrics.python import metrics_writer as rmw
 from dataclasses import dataclass
+from bounding_box import BoundingBox
 from fp_event_creator import create_fp_event_v2
 
 
 from metric_charts import *
 
 IOU_THRESHOLD = 0.5
-MIN_CONFIDENCE = 0.05
+MIN_CONFIDENCE = 0.01
 OUT_PATH = Path("/tmp/resim/outputs")
 
 @dataclass
@@ -26,23 +27,6 @@ class SummaryMetrics:
     false_positives: int
     false_negatives: int
 
-# --- Data class for bounding boxes ---
-class BoundingBox:
-    def __init__(self, bbox: List[float], cls: str, score: Optional[float] = None):
-        self.xmin, self.ymin, self.xmax, self.ymax = bbox
-        self.cls = cls
-        self.score = score
-        self.matched = False
-
-    def iou(self, other: 'BoundingBox') -> float:
-        xi1, yi1 = max(self.xmin, other.xmin), max(self.ymin, other.ymin)
-        xi2, yi2 = min(self.xmax, other.xmax), min(self.ymax, other.ymax)
-        inter_area = max(0, xi2 - xi1) * max(0, yi2 - yi1)
-        if inter_area == 0:
-            return 0.0
-        box1_area = (self.xmax - self.xmin) * (self.ymax - self.ymin)
-        box2_area = (other.xmax - other.xmin) * (other.ymax - other.ymin)
-        return inter_area / (box1_area + box2_area - inter_area)
 
 # --- Parsing helpers ---
 def parse_boxes(box_str: str, is_prediction: bool) -> List[BoundingBox]:
@@ -98,11 +82,15 @@ def match_and_score(
         else:
             tp.append(0)
             fp.append(1) # This happens for either duplicates or not matches. TODO - maybe handle duplicates differently
-            
+
             fp_num += 1 
             if writer is not None and score >= min_detection_conf:
                 # add_fp_image_event(writer, img)
-                create_fp_event_v2(writer,img,OUT_PATH)
+                print(f"False positive detected at img: {img}")
+                create_fp_event_v2(writer,img,OUT_PATH,pred_box)
+                
+            else:
+                print(f"Score on img : {img} is : {score}")
 
 
 
@@ -125,6 +113,7 @@ def calculate_summary_stats(match_result: MatchResults, min_confidence: float = 
 # --- Main driver ---
 def run_test_metrics(writer: rmw.ResimMetricsWriter):
     csv_path = "/tmp/resim/inputs/logs/detections.csv"
+    print("This is the latest run")
     print("Loading the CSV")
     gt_dict, all_preds = load_csv(csv_path)
     
@@ -154,3 +143,4 @@ def run_test_metrics(writer: rmw.ResimMetricsWriter):
         
     add_precision_recall_curve(writer,precision,recall)
     print("Finished Running Test Metrics")
+    

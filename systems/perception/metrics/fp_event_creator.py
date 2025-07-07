@@ -3,6 +3,8 @@ from pathlib import Path
 import uuid
 import resim.metrics.python.metrics_utils as mu
 from resim.metrics.python import metrics_writer as rmw
+from bounding_box import BoundingBox
+from image_writer import write_image_with_bbox
 from resim.metrics.python.metrics import (
   ExternalFileMetricsData,      
   MetricStatus,
@@ -11,8 +13,27 @@ from resim.metrics.python.metrics import (
 
 METRIC_IMAGES_DIRNAME = "metric_images"
 
+def save_image_with_bbox(image_path: str, out_dir: Path, pred_box: BoundingBox) -> ExternalFileMetricsData:
+    '''
+    Function takes the path to the input image, and then embeds the bounding box and saves it to file and generates
+    an returns an `ExternalFileMetricsData` object, which can be used to add the image to the ReSim Web UI for events
+    '''
+    dest_dir = out_dir / METRIC_IMAGES_DIRNAME
+    dest_dir.mkdir(parents=True, exist_ok=True)
 
-def create_fp_event_v2(writer: rmw.ResimMetricsWriter, image_path: str, out_dir: Path):
+    new_name = f"{uuid.uuid4().hex}_{Path(image_path).name}"
+    dest_path = dest_dir / new_name
+
+    # call OpenCV logic from image_writer
+    write_image_with_bbox(Path(image_path), dest_path, pred_box)
+
+    return ExternalFileMetricsData(
+        name=f"FP Image: {dest_path.name}",
+        filename=str(dest_path.relative_to(out_dir)),
+    )
+
+
+def create_fp_event_v2(writer: rmw.ResimMetricsWriter, image_path: str, out_dir: Path, pred_box: BoundingBox):
     """
     Create a Resim event for a false positive detection by attaching the raw image.
 
@@ -21,7 +42,8 @@ def create_fp_event_v2(writer: rmw.ResimMetricsWriter, image_path: str, out_dir:
         image_path: Absolute path to the false positive image.
         out_dir: Base output directory for Resim metrics (e.g., /tmp/resim/outputs)
     """
-    image_data = save_image_for_metric(image_path, out_dir)
+    # image_data = save_image_for_metric(image_path, out_dir)
+    image_data = save_image_with_bbox(image_path, out_dir, pred_box)
     img_path = Path(image_path)
     hash = uuid.uuid4().hex
     metric = create_image_metric(writer, img_path, image_data ,hash)
