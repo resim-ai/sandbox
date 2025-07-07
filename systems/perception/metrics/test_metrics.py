@@ -3,12 +3,28 @@ import pandas as pd
 import ast
 from typing import List, Dict, Tuple, Optional
 from resim.metrics.python import metrics_writer as rmw
-
+from dataclasses import dataclass
+from fp_event_creator import create_fp_event_v2
 
 
 from metric_charts import *
 
 IOU_THRESHOLD = 0.5
+MIN_CONFIDENCE = 0.05
+OUT_PATH = Path("/tmp/resim/outputs")
+
+@dataclass
+class MatchResults:
+    tp: List[int] # a vector of detection results with 1 if true positive and 0 if not
+    fp: List[int] # a vector of detection results with 1 if false positive and 9 if not
+    scores: List[float] # confidence scores for every result
+    total_gt: int # Total detections present in the ground truth (needed for false negatives calc)
+    
+@dataclass
+class SummaryMetrics:
+    true_positives: int
+    false_positives: int
+    false_negatives: int
 
 # --- Data class for bounding boxes ---
 class BoundingBox:
@@ -34,11 +50,16 @@ def parse_boxes(box_str: str, is_prediction: bool) -> List[BoundingBox]:
     return [BoundingBox(b["bbox"], b["class"], b.get("score") if is_prediction else None) for b in box_list]
 
 def load_csv(csv_path: str) -> Tuple[Dict[str, List[BoundingBox]], List[Tuple[str, BoundingBox]]]:
+    '''
+    LoadCSV returns a tuple containing 
+    1. a dict {filename: [GT bounding box]}
+    2. [(filename, pred_bbox)] - Each prediction is sepearately formed in a list so we can sort by confidence
+    '''
     df = pd.read_csv(csv_path)
     gt_dict, all_preds = {}, []
 
     for _, row in df.iterrows():
-        fname = Path(row["filename"]).name
+        fname = Path(row["filename"])
         gt_boxes = parse_boxes(row["gt_bbox"], is_prediction=False)
         pred_boxes = parse_boxes(row["model_bbox"], is_prediction=True)
         gt_dict[fname] = gt_boxes
@@ -48,38 +69,58 @@ def load_csv(csv_path: str) -> Tuple[Dict[str, List[BoundingBox]], List[Tuple[st
     return gt_dict, all_preds
 
 # --- Evaluation ---
-def match_and_score(gt_dict: Dict[str, List[BoundingBox]], all_preds: List[Tuple[str, BoundingBox]],writer: rmw.ResimMetricsWriter) -> Tuple[List[int], List[int], int]:
+def match_and_score(
+    gt_dict: Dict[str, List[BoundingBox]],
+    all_preds: List[Tuple[str, BoundingBox]],
+    writer: Optional[rmw.ResimMetricsWriter] = None,
+    min_detection_conf: float = 0.45
+) -> MatchResults:
     all_preds.sort(key=lambda x: x[1].score or 0, reverse=True)
-    tp, fp = [], []
+    tp, fp, scores = [], [], []
+    
+    # mark every gt img as not matched
     matched = {img: [False] * len(gt_list) for img, gt_list in gt_dict.items()}
 
     for img, pred_box in all_preds:
+        score = pred_box.score or 0.0
+        scores.append(score)
+        # Get the gt list for the image corresponding to the prediction
         gt_boxes = gt_dict.get(img, [])
         ious = [pred_box.iou(gt) for gt in gt_boxes]
         max_iou = max(ious, default=0.0)
         match_idx = ious.index(max_iou) if max_iou >= IOU_THRESHOLD else -1
-
+        fp_num = 0
+        # if we find a match and we did not previously find a match for that bbox, it is a TP
         if match_idx != -1 and not matched[img][match_idx]:
             tp.append(1)
             fp.append(0)
             matched[img][match_idx] = True
         else:
             tp.append(0)
-            fp.append(1)
-            # when a false positive create an event
-            add_fp_image_event(writer, img)
+            fp.append(1) # This happens for either duplicates or not matches. TODO - maybe handle duplicates differently
+            
+            fp_num += 1 
+            if writer is not None and score >= min_detection_conf:
+                # add_fp_image_event(writer, img)
+                create_fp_event_v2(writer,img,OUT_PATH)
+
+
 
     total_gt = sum(len(v) for v in gt_dict.values())
-    return tp, fp, total_gt
+    return MatchResults(tp=tp, fp=fp, scores=scores, total_gt=total_gt)
 
 # --- PR Curve Calculation ---
-def compute_pr_curve(tp: List[int], fp: List[int], total_gt: int) -> Tuple[List[float], List[float]]:
-    tp_cum, fp_cum = np.cumsum(tp), np.cumsum(fp)
+def compute_pr_curve(match_result: MatchResults) -> Tuple[List[float], List[float]]:
+    tp_cum, fp_cum = np.cumsum(match_result.tp), np.cumsum(match_result.fp)
     precision = tp_cum / (tp_cum + fp_cum + 1e-8)
-    recall = tp_cum / (total_gt + 1e-8)
+    recall = tp_cum / (match_result.total_gt + 1e-8)
     return precision.tolist(), recall.tolist()
 
-
+def calculate_summary_stats(match_result: MatchResults, min_confidence: float = 0.45) -> SummaryMetrics:
+    tp = sum(tp for tp, score in zip(match_result.tp, match_result.scores) if score >= min_confidence)
+    fp = sum(fp for fp, score in zip(match_result.fp, match_result.scores) if score >= min_confidence)
+    fn = match_result.total_gt - tp
+    return SummaryMetrics(true_positives=tp, false_positives=fp, false_negatives=fn)
 
 # --- Main driver ---
 def run_test_metrics(writer: rmw.ResimMetricsWriter):
@@ -90,17 +131,20 @@ def run_test_metrics(writer: rmw.ResimMetricsWriter):
     print("Calculating IOU and matching detections")
     
     # tp, fp are both list of binaries containing either if they were true positive or false positive
-    tp, fp, total_gt = match_and_score(gt_dict, all_preds,writer)
+    match_result = match_and_score(gt_dict, all_preds,writer,MIN_CONFIDENCE)
     
-    true_positives = sum(tp) # every 1 gets added
-    false_positives = sum(fp)
-    false_negatives = total_gt - true_positives # False Negatives = Ground truth boxes - true positives
+    print("Total Obstacles in the scene from Ground truth are:  ",match_result.total_gt)
+    
+    # Prompt to chatgpt:name this calculate_summary_stats(match_result) and name a class SummaryMetrics with the below three values
+    summary_metrics = calculate_summary_stats(match_result, MIN_CONFIDENCE)
+    
+    
     # Computing Precision and Recall
-    precision, recall = compute_pr_curve(tp, fp, total_gt)
+    precision, recall = compute_pr_curve(match_result)
     
-    add_summary_table_metric(writer, len(all_preds), true_positives, false_positives, false_negatives)
+    add_summary_table_metric(writer, len(all_preds), summary_metrics.true_positives, summary_metrics.false_positives, summary_metrics.false_negatives)
     
-    add_scalar_metrics(writer, false_positives, true_positives, false_negatives)
+    add_scalar_metrics(writer, summary_metrics.false_positives, summary_metrics.true_positives, summary_metrics.false_negatives)
     
     print("Precision-Recall Curve:")
     for p, r in zip(precision, recall):
