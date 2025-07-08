@@ -85,13 +85,13 @@ def create_image_metric(
     Create an image list metric for the given image.
     """
     return (
-        writer.add_image_list_metric(name=f"False Positive img {img_path.stem} - {event_hash}")
+        writer.add_image_metric(name=f"False Positive img {img_path.stem} - {event_hash}")
         .with_description(f"False positive detected at image {img_path.stem}")
         .with_status(MetricStatus.FAIL_WARN_METRIC_STATUS)
         .with_importance(MetricImportance.MEDIUM_IMPORTANCE)
         .with_should_display(True)
         .with_blocking(False)
-        .with_image_list_data([image_data])
+        .with_image_data(image_data)
         .is_event_metric()
     )
 
