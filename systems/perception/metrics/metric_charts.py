@@ -2,11 +2,14 @@ import plotly.graph_objects as go
 from resim.metrics.proto import metrics_pb2 as mu
 from resim.metrics.python import metrics_writer as rmw
 import resim.metrics.python.metrics_utils as muu
+from typing import List
 from resim.metrics.python.metrics import (
   SeriesMetricsData,
   MetricStatus,
-  MetricImportance
+  MetricImportance,
+  ExternalFileMetricsData
 )
+
 import numpy as np
 import uuid
 def add_precision_recall_curve(writer: rmw.ResimMetricsWriter,precision: list,recall: list):
@@ -135,3 +138,14 @@ def add_fp_image_event(writer: rmw.ResimMetricsWriter,filename: str):
                 .is_event_metric()
             ]
         )
+        
+def add_fp_image_list(writer: rmw.ResimMetricsWriter, img_list: List[ExternalFileMetricsData]):
+    (
+        writer.add_image_list_metric(name="All False Positives")
+            .with_description("All false positives with score > min threshold")
+            .with_status(MetricStatus.FAIL_WARN_METRIC_STATUS)
+            .with_importance(MetricImportance.LOW_IMPORTANCE)
+            .with_should_display(True)
+            .with_blocking(False)
+            .with_image_list_data(img_list)
+    )

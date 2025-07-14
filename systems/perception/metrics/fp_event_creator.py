@@ -33,7 +33,7 @@ def save_image_with_bbox(image_path: str, out_dir: Path, pred_box: BoundingBox) 
     )
 
 
-def create_fp_event_v2(writer: rmw.ResimMetricsWriter, image_path: str, out_dir: Path, pred_box: BoundingBox):
+def create_fp_event_v2(writer: rmw.ResimMetricsWriter, image_path: str, out_dir: Path, pred_box: BoundingBox) -> ExternalFileMetricsData:
     """
     Create a Resim event for a false positive detection by attaching the raw image.
 
@@ -41,6 +41,9 @@ def create_fp_event_v2(writer: rmw.ResimMetricsWriter, image_path: str, out_dir:
         writer: The ResimMetricsWriter instance.
         image_path: Absolute path to the false positive image.
         out_dir: Base output directory for Resim metrics (e.g., /tmp/resim/outputs)
+        
+    Returns:
+        External Metrics data for the file stored for false positive
     """
     # image_data = save_image_for_metric(image_path, out_dir)
     image_data = save_image_with_bbox(image_path, out_dir, pred_box)
@@ -48,6 +51,8 @@ def create_fp_event_v2(writer: rmw.ResimMetricsWriter, image_path: str, out_dir:
     hash = uuid.uuid4().hex
     metric = create_image_metric(writer, img_path, image_data ,hash)
     create_event(writer, img_path, metric, hash)
+    
+    return image_data
 
 
 def save_image_for_metric(image_path: str, out_dir: Path) -> ExternalFileMetricsData:

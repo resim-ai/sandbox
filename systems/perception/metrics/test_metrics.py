@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from bounding_box import BoundingBox
 from fp_event_creator import create_fp_event_v2
 from fn_event_creator import create_fn_event
+from resim.metrics.python.metrics import ExternalFileMetricsData
 
 
 from metric_charts import *
@@ -24,6 +25,7 @@ class MatchResults:
     scores: List[float] # confidence scores for every result
     total_gt: int # Total detections present in the ground truth (needed for false negatives calc)
     unmatched_gt: Dict[Path, List[BoundingBox]] 
+    fp_images: List[ExternalFileMetricsData]
     
 @dataclass
 class SummaryMetrics:
@@ -98,7 +100,7 @@ def match_and_score(
 ) -> MatchResults:
     all_preds.sort(key=lambda x: x[1].score or 0, reverse=True)
     tp, fp, scores = [], [], []
-    
+    fp_images = [] # for false positive image carousel
     # mark every gt img as not matched
     matched = {img: [False] * len(gt_list) for img, gt_list in gt_dict.items()}
 
@@ -124,7 +126,8 @@ def match_and_score(
             if writer is not None and score >= min_detection_conf:
                 # add_fp_image_event(writer, img)
                 print(f"False positive detected at img: {img}")
-                create_fp_event_v2(writer,img,OUT_PATH,pred_box)
+                img_data = create_fp_event_v2(writer,img,OUT_PATH,pred_box)
+                fp_images.append(img_data)
                 
             else:
                 print(f"Score on img : {img} is : {score}")
@@ -132,7 +135,7 @@ def match_and_score(
 
     unmatched_gt = compile_unmatched_gt_boxes(gt_dict,matched)
     total_gt = sum(len(v) for v in gt_dict.values())
-    return MatchResults(tp=tp, fp=fp, scores=scores, total_gt=total_gt, unmatched_gt=unmatched_gt)
+    return MatchResults(tp=tp, fp=fp, scores=scores, total_gt=total_gt, unmatched_gt=unmatched_gt, fp_images=fp_images)
 
 # --- PR Curve Calculation ---
 def compute_pr_curve(match_result: MatchResults) -> Tuple[List[float], List[float]]:
@@ -170,6 +173,11 @@ def run_test_metrics(writer: rmw.ResimMetricsWriter):
         
         print(f"False negative(s) detected at img: {img_path}")
         create_fn_event(writer, str(img_path), OUT_PATH, unmatched_boxes, pred_boxes)
+        
+    # All false positives
+    if match_result.fp_images:
+        add_fp_image_list(writer,match_result.fp_images)
+        
     
     # Prompt to chatgpt:name this calculate_summary_stats(match_result) and name a class SummaryMetrics with the below three values
     summary_metrics = calculate_summary_stats(match_result, MIN_CONFIDENCE)
