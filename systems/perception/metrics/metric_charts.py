@@ -135,6 +135,3 @@ def add_fp_image_event(writer: rmw.ResimMetricsWriter,filename: str):
                 .is_event_metric()
             ]
         )
-    
-    
-    pass

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Edit these to point to folders on your host machine
-HOST_INPUT_FOLDER="../hack/output"
+HOST_INPUT_FOLDER="../experience/output"
 HOST_EXPERIENCE_FOLDER="../experience/samples"
 HOST_OUTPUT_FOLDER="./output"
 

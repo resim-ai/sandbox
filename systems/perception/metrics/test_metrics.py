@@ -6,13 +6,16 @@ from resim.metrics.python import metrics_writer as rmw
 from dataclasses import dataclass
 from bounding_box import BoundingBox
 from fp_event_creator import create_fp_event_v2
+from fn_event_creator import create_fn_event
 
 
 from metric_charts import *
 
 IOU_THRESHOLD = 0.5
-MIN_CONFIDENCE = 0.01
+MIN_CONFIDENCE = 0.15
 OUT_PATH = Path("/tmp/resim/outputs")
+IN_ROOT_PATH = Path("/tmp/resim/inputs")
+
 
 @dataclass
 class MatchResults:
@@ -20,6 +23,7 @@ class MatchResults:
     fp: List[int] # a vector of detection results with 1 if false positive and 9 if not
     scores: List[float] # confidence scores for every result
     total_gt: int # Total detections present in the ground truth (needed for false negatives calc)
+    unmatched_gt: Dict[Path, List[BoundingBox]] 
     
 @dataclass
 class SummaryMetrics:
@@ -43,7 +47,15 @@ def load_csv(csv_path: str) -> Tuple[Dict[str, List[BoundingBox]], List[Tuple[st
     gt_dict, all_preds = {}, []
 
     for _, row in df.iterrows():
-        fname = Path(row["filename"])
+        relative_path = Path(row["filename"])
+        
+
+        # If path is absolute and under /tmp/resim/inputs, make it relative to that root
+        if relative_path.is_absolute() and str(relative_path).startswith(str(IN_ROOT_PATH)):
+            relative_path = relative_path.relative_to(IN_ROOT_PATH)
+
+        # Now always prepend experience/
+        fname = IN_ROOT_PATH / "experience" / relative_path
         gt_boxes = parse_boxes(row["gt_bbox"], is_prediction=False)
         pred_boxes = parse_boxes(row["model_bbox"], is_prediction=True)
         gt_dict[fname] = gt_boxes
@@ -51,6 +63,31 @@ def load_csv(csv_path: str) -> Tuple[Dict[str, List[BoundingBox]], List[Tuple[st
             all_preds.append((fname, box))
 
     return gt_dict, all_preds
+
+
+def compile_unmatched_gt_boxes(
+    gt_dict: Dict[Path, List[BoundingBox]],
+    matched: Dict[Path, List[bool]]
+) -> Dict[Path, List[BoundingBox]]:
+    """
+    Extracts all unmatched ground truth bounding boxes.
+
+    Args:
+        gt_dict: Mapping of image path → list of ground truth boxes.
+        matched: Mapping of image path → list of booleans indicating matched status for each GT box.
+
+    Returns:
+        Dictionary mapping image path → list of unmatched bounding boxes.
+    """
+    unmatched_gt = {}
+    for img, gt_list in gt_dict.items():
+        unmatched_boxes = [
+            box for idx, box in enumerate(gt_list)
+            if not matched[img][idx]
+        ]
+        if unmatched_boxes:
+            unmatched_gt[img] = unmatched_boxes
+    return unmatched_gt
 
 # --- Evaluation ---
 def match_and_score(
@@ -93,9 +130,9 @@ def match_and_score(
                 print(f"Score on img : {img} is : {score}")
 
 
-
+    unmatched_gt = compile_unmatched_gt_boxes(gt_dict,matched)
     total_gt = sum(len(v) for v in gt_dict.values())
-    return MatchResults(tp=tp, fp=fp, scores=scores, total_gt=total_gt)
+    return MatchResults(tp=tp, fp=fp, scores=scores, total_gt=total_gt, unmatched_gt=unmatched_gt)
 
 # --- PR Curve Calculation ---
 def compute_pr_curve(match_result: MatchResults) -> Tuple[List[float], List[float]]:
@@ -123,6 +160,16 @@ def run_test_metrics(writer: rmw.ResimMetricsWriter):
     match_result = match_and_score(gt_dict, all_preds,writer,MIN_CONFIDENCE)
     
     print("Total Obstacles in the scene from Ground truth are:  ",match_result.total_gt)
+    
+    # Log events for all false negatives
+    # For each unmatched GT box, create a false negative event
+    for img_path, unmatched_boxes in match_result.unmatched_gt.items():
+        # Gather all predictions for this image (used to show context in event)
+        pred_boxes = [box for (fname, box) in all_preds if fname == img_path]
+
+        
+        print(f"False negative(s) detected at img: {img_path}")
+        create_fn_event(writer, str(img_path), OUT_PATH, unmatched_boxes, pred_boxes)
     
     # Prompt to chatgpt:name this calculate_summary_stats(match_result) and name a class SummaryMetrics with the below three values
     summary_metrics = calculate_summary_stats(match_result, MIN_CONFIDENCE)

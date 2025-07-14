@@ -52,6 +52,8 @@ def analyze_sequence_v2(input_csv, output_path):
 
     for idx,row in df.iterrows():
         img_path = row['filename']
+        if not img_path.startswith("/tmp/resim/inputs"):
+            img_path = os.path.join("/tmp/resim/inputs", img_path)
 
         # exit early if the file doesnt exist
         if not os.path.isfile(img_path):
