@@ -8,10 +8,8 @@ from transformers import OwlViTProcessor, OwlViTForObjectDetection
 
 
 # literals
-objects_to_detect = [["Van","a car"]]
+objects_to_detect = [["Van","a car","Truck"]]
 
-# Locations
-gt_info_csv = './dataset/20180807_145028.csv'
 
 
 class OwlModel:
@@ -62,19 +60,36 @@ class OwlModel:
         plt.axis('off')
         plt.show()
 
-    def detect_objects(self,image_filename, threshold:float):
+    def detect_objects(self, image_filename, threshold: float):
         image = Image.open(image_filename)
         inputs = self.processor(text=objects_to_detect, images=image, return_tensors="pt")
         outputs = self.model(**inputs)
         target_sizes = torch.Tensor([image.size[::-1]])
 
-        # Convert outputs (bounding boxes and class logits) to COCO API
         results = self.processor.post_process_object_detection(
-            outputs, threshold, target_sizes=target_sizes) # can we use threshold for parameter sweep?
+            outputs, threshold, target_sizes=target_sizes)
 
-        i = 0  # Retrieve predictions for the first image for the corresponding text queries
+        i = 0
         boxes, scores, labels = results[i]["boxes"], results[i]["scores"], results[i]["labels"]
 
-        return (boxes,scores,labels)
+        # Filter boxes by width and height
+        filtered_boxes = []
+        filtered_scores = []
+        filtered_labels = []
+
+        for box, score, label in zip(boxes, scores, labels):
+            x0, y0, x1, y1 = box.tolist()
+            width = x1 - x0
+            height = y1 - y0
+            if width >= 50 and height >= 50:
+                filtered_boxes.append(box)
+                filtered_scores.append(score)
+                filtered_labels.append(label)
+
+        return (
+            torch.stack(filtered_boxes) if filtered_boxes else torch.empty((0, 4)),
+            torch.tensor(filtered_scores),
+            torch.tensor(filtered_labels),
+        )
 
 
