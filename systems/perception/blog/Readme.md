@@ -1,5 +1,5 @@
 # Perception Case Study - Analyzing Object Detection System using ReSim
-The perception module of an autonomy system is responsible for taking sensor inputs and reasoning where objects are in space and where the ego vehicle/robot is relative to these objects. Camera is a primary sensor for perception stacks for maany autonomous systems as they provide rich RGB information about the world. Deep learning models are trained using a comprehensive dataset of images to make inference from camera data while the robot is operating in its application. 
+The perception module of an autonomy system is responsible for taking sensor inputs and reasoning about where objects are in space, and where the ego vehicle or robot is relative to those objects. Many autonomy systems use cameras as a primary sensor for perception stacks, as they provide rich RGB information about the world. Deep learning models are trained using comprehensive image datasets to make inferences from camera data while the robot is operating in its environment.
 
 ## Object Detection
 
@@ -9,19 +9,21 @@ An Object Detection system is responsible for detecting:
 
 ![](media/object_detection_sample.png)
 
-Training these AI models require following a comprehensive pipeline of curating specialized datasets, training different models, evaluating trained models with test data sets. Also in application, the robot can evaluate new situations, in which case, new cases (images) are rapidly added to both the training dataset and testing dataset. 
+Training these AI models requires following a comprehensive pipeline: curating specialized datasets, training models, and evaluating the trained models with test datasets. Additionally, in real-world applications, the robot may encounter new situations, in which case new cases (images) are rapidly added to both the training and testing datasets.
 
 ## ReSim 
-Evaluation of these datasets require repeated metrics calculations and curating and analyzing visualizations for different versions of these models. [ReSim](https://app.resim.ai) is a cloud simulation testing and analysis platform curated specifically for robotic applications, and is a natural fit for evaluating perception systems like object detection, as it is purpose-built for simulating, testing, and analyzing robotic behavior at scale.
+Evaluation of these datasets requires repeated metric calculations and the curation and analysis of visualizations across different model versions. ReSim is a cloud-based simulation testing and analysis platform, built specifically for robotic applications. It is a natural fit for evaluating perception systems like object detection, as it is purpose-built for simulating, testing, and analyzing robotic behavior at scale.
 
-It provides cloud testing infrastructure at scale, which allows the developer to easily test thousands of images with the click of a button on the cloud, and visualize results with well curated metrics and visualizations. It allows easy additions to test cases, visualizations, as well as has tools to test parameters, and compare versions. This blog will show the evaluation of Object Detection using the ReSim platform. 
+ReSim provides scalable cloud testing infrastructure, allowing developers to test thousands of images with the click of a button and visualize results using curated metrics and visualizations. It supports easy addition of test cases and visualizations, and includes tools for parameter tuning and version comparison. This blog post demonstrates how to evaluate object detection using the ReSim platform.
 
 ### Step 0 - Dataset Curation
-We will be using a subset of the [Audi A2D2 Autonomous Driving dataset](https://www.a2d2.audi/). A sample 10 images for testing locally will be provided in the sandbox repository. This dataset contains different scenes (urban driving image above), highway driving following truck, among others. ![Highway truck](media/highway_truck.png). The ground truth annotations include the following:
+We will use a subset of the [Audi A2D2 Autonomous Driving dataset](https://www.a2d2.audi/). A sample of 10 images for local testing will be provided in the sandbox repository. This dataset contains various scenes such as urban driving (as shown above), highway driving while following a truck, among others.
+
+We will be using a subset of the  A sample 10 images for testing locally will be provided in the sandbox repository. This dataset contains different scenes (urban driving image above), highway driving following truck, among others. ![Highway truck](media/highway_truck.png). The ground truth annotations include the following:
 - What objects are in the scene (class label)
 - bounding box rectangles in pixel coordinates showing their location
 
-The ground truth annotaions and the images are added to S3 with the required access, and become the [inputs to the Experience stage](https://docs.resim.ai/setup/adding-experiences/). 
+The ground truth annotaions and images are added to S3 with the required access, and become the [inputs to the Experience stage](https://docs.resim.ai/setup/adding-experiences/). 
 
 ### Step 1 - Experience Build
 The experience stage is running the model on the images on inputs. the code for this will be found in the `sandbox/systems/perception/experience` folder. We will be running [OWL VIT model](https://huggingface.co/docs/transformers/en/model_doc/owlvit) which is a general purpose model that can take queries of objects (in this case - cars, trucks) and detect those objects in images. The code for running the model and detecting objects is dockerized and [forms the experience build](https://docs.resim.ai/setup/build-images/). This is uploaded to an ECR and given the necessary access, so ReSim can extract and run in the cloud.  
