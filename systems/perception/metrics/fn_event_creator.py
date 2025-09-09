@@ -77,8 +77,8 @@ def create_fn_image_metrics(
     Returns a list of metrics.
     """
     gt_metric = (
-        writer.add_image_metric(name=f"FN GT {img_path.stem}")
-        .with_description(f"Unmatched GT in image {img_path.stem}")
+        writer.add_image_metric(name=f"False Negative Ground Truth")
+        .with_description(f"Unmatched Ground truth in image {img_path.stem}")
         .with_status(MetricStatus.FAIL_WARN_METRIC_STATUS)
         .with_importance(MetricImportance.MEDIUM_IMPORTANCE)
         .with_should_display(True)
@@ -88,7 +88,7 @@ def create_fn_image_metrics(
     )
 
     pred_metric = (
-        writer.add_image_metric(name=f"FN Predictions {img_path.stem}")
+        writer.add_image_metric(name=f"False Negative Predictions")
         .with_description(f"All predictions for image {img_path.stem} (missed GTs)")
         .with_status(MetricStatus.FAIL_WARN_METRIC_STATUS)
         .with_importance(MetricImportance.LOW_IMPORTANCE)

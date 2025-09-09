@@ -28,7 +28,7 @@ def save_image_with_bbox(image_path: str, out_dir: Path, pred_box: BoundingBox) 
     write_image_with_bbox(Path(image_path), dest_path, pred_box)
 
     return ExternalFileMetricsData(
-        name=f"FP Image: {dest_path.name}",
+        name=dest_path.name,
         filename=str(dest_path.relative_to(out_dir)),
     )
 
@@ -90,7 +90,7 @@ def create_image_metric(
     Create an image list metric for the given image.
     """
     return (
-        writer.add_image_metric(name=f"False Positive img {img_path.stem} - {event_hash}")
+        writer.add_image_metric(name=f"False Positive Image")
         .with_description(f"False positive detected at image {img_path.stem}")
         .with_status(MetricStatus.FAIL_WARN_METRIC_STATUS)
         .with_importance(MetricImportance.MEDIUM_IMPORTANCE)

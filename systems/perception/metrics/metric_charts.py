@@ -4,41 +4,44 @@ from resim.metrics.python import metrics_writer as rmw
 import resim.metrics.python.metrics_utils as muu
 from typing import List
 from resim.metrics.python.metrics import (
-  SeriesMetricsData,
   MetricStatus,
   MetricImportance,
   ExternalFileMetricsData
 )
+from resim.metrics.resim_style import resim_plotly_style, resim_colors as RESIM_COLORS, RESIM_TURQUOISE
 
 import numpy as np
 import uuid
-def add_precision_recall_curve(writer: rmw.ResimMetricsWriter,precision: list,recall: list):
-    precision_data = SeriesMetricsData(
-        name="camera_precision_data",
-        series=np.array(precision),
-        unit=""
+
+def add_precision_recall_curve(writer: rmw.ResimMetricsWriter, precision: list, recall: list):
+    fig = go.Figure()
+    fig.add_trace(
+        go.Scatter(
+            x=recall,
+            y=precision,
+            mode="lines+markers",
+            name="PR Curve",
+            line=dict(color=RESIM_TURQUOISE, width=2),
+        )
     )
-    recall_data = SeriesMetricsData(
-        name="camera_recall_data",
-        series=np.array(recall),
-        unit=""
+
+    fig.update_layout(
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+        xaxis=dict(title="Recall"),
+        yaxis=dict(title="Precision"),
+        showlegend=True,
+        legend=dict(orientation="h", y=1.0, x=0.5, xanchor="center", yanchor="bottom"),
     )
-    status_data = SeriesMetricsData(
-        name="camera_pr_statuses",
-        series=np.array([MetricStatus.PASSED_METRIC_STATUS] * len(precision)),
-        unit=""
-    )
+
+    resim_plotly_style(fig)
     (
-        writer.add_line_plot_metric(name="Precision-Recall Curve")
-        .with_description("Precision-Recall curve for camera detections")
-        .with_status(MetricStatus.PASSED_METRIC_STATUS)
-        .with_importance(MetricImportance.ZERO_IMPORTANCE)
-        .with_should_display(True)
+        writer.add_plotly_metric("Precision-Recall Curve")
+        .with_description("Precision-Recall curve for camera detections.")
         .with_blocking(False)
-        .append_series_data(recall_data, precision_data, "precision")
-        .append_statuses_data(status_data)
-        .with_x_axis_name("Recall")
-        .with_y_axis_name("Precision")
+        .with_plotly_data(str(fig.to_json()))
+        .with_importance(MetricImportance.HIGH_IMPORTANCE)
+        .with_status(MetricStatus.PASSED_METRIC_STATUS)
     )
     
 def add_scalar_metrics(writer: rmw.ResimMetricsWriter, false_positives, true_positives,false_negatives):
@@ -96,6 +99,9 @@ def add_summary_table_metric(
             )
         ]
     )
+    
+    resim_plotly_style(fig)
+    fig.update_layout(template="plotly")
 
     (
         writer.add_plotly_metric(name=title)

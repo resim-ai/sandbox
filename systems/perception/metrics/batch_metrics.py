@@ -78,10 +78,9 @@ def run_batch_metrics():
         )
         
         # Add a summary text metric
-        summary = f"""# Flight Batch Summary
-            - Total False Positives: {total_fp}
-            - Total True Positives: {total_tp} 
-            - Total False Negatives: {total_fn}
+        summary = f"""- Total False Positives: {total_fp}
+                      - Total True Positives: {total_tp} 
+                      - Total False Negatives: {total_fn}
             """
             
         (
