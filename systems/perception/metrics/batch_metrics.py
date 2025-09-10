@@ -75,6 +75,7 @@ def run_batch_metrics():
             .with_value(total_fn)
             .with_unit("")
             .with_status(MetricStatus.PASSED_METRIC_STATUS)
+            .with_tag(key="RESIM_SUMMARY", value="1")
         )
         
         # Add a summary text metric

@@ -2,7 +2,7 @@
 
 # Set image name and tag
 IMAGE_NAME="perception_test"
-TAG="latest"
+TAG="ver_5"
 
 # Build the Docker image for linux/amd64 using Dockerfile.exp
 docker buildx build \

@@ -8,7 +8,7 @@ from transformers import OwlViTProcessor, OwlViTForObjectDetection
 
 
 # literals
-objects_to_detect = [["Van","a car","Truck"]]
+objects_to_detect = [["Car","Truck","Van"]]
 
 
 
@@ -81,7 +81,7 @@ class OwlModel:
             x0, y0, x1, y1 = box.tolist()
             width = x1 - x0
             height = y1 - y0
-            if width >= 50 and height >= 50:
+            if width >= 20 and height >= 20:
                 filtered_boxes.append(box)
                 filtered_scores.append(score)
                 filtered_labels.append(label)

@@ -1,6 +1,7 @@
 from pathlib import Path
 import pandas as pd
 import ast
+import os
 from typing import List, Dict, Tuple, Optional
 from resim.metrics.python import metrics_writer as rmw
 from dataclasses import dataclass
@@ -17,6 +18,31 @@ MIN_CONFIDENCE = 0.15
 OUT_PATH = Path("/tmp/resim/outputs")
 IN_ROOT_PATH = Path("/tmp/resim/inputs")
 
+# Global variable for input path addendum
+input_path_addendum = None
+
+def detect_input_path_addendum(filename: str) -> str:
+    """Detect the correct addendum for input paths by checking file existence."""
+    global input_path_addendum
+    
+    if input_path_addendum is not None:
+        return input_path_addendum
+    
+    # Check if file exists in /tmp/resim/inputs/experience
+    experience_path = os.path.join("/tmp/resim/inputs/experience", filename)
+    if os.path.isfile(experience_path):
+        input_path_addendum = "/tmp/resim/inputs/experience"
+        return input_path_addendum
+    
+    # Check if file exists in /dataset
+    dataset_path = os.path.join("/dataset", filename)
+    if os.path.isfile(dataset_path):
+        input_path_addendum = "/dataset"
+        return input_path_addendum
+    
+    # Default to /tmp/resim/inputs/experience if neither exists
+    input_path_addendum = "/tmp/resim/inputs/experience"
+    return input_path_addendum
 
 @dataclass
 class MatchResults:
@@ -56,8 +82,9 @@ def load_csv(csv_path: str) -> Tuple[Dict[str, List[BoundingBox]], List[Tuple[st
         if relative_path.is_absolute() and str(relative_path).startswith(str(IN_ROOT_PATH)):
             relative_path = relative_path.relative_to(IN_ROOT_PATH)
 
-        # Now always prepend experience/
-        fname = IN_ROOT_PATH / "experience" / relative_path
+        # Use path detection to determine the correct base path
+        base_path = detect_input_path_addendum(str(relative_path))
+        fname = Path(base_path) / relative_path
         gt_boxes = parse_boxes(row["gt_bbox"], is_prediction=False)
         pred_boxes = parse_boxes(row["model_bbox"], is_prediction=True)
         gt_dict[fname] = gt_boxes

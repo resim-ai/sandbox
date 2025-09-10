@@ -2,6 +2,7 @@ import json
 from PIL import Image
 import pandas as pd
 import os
+from pathlib import Path
 from owl_model import OwlModel
 import argparse
 
@@ -11,6 +12,42 @@ test_image_path = '/tmp/sample_image.png'
 # Thresholds to sweep over
 thresholds = [0.95, 0.90, 0.85, 0.80, 0.75, 0.70, 0.65, 0.60, 0.55, 0.50, 0.45, 0.40, 0.35, 0.30,0.25,0.20,0.15,0.10,0.05]
 model = OwlModel()
+
+# Global variable for input path addendum
+input_path_addendum = None
+
+def get_experience_location() -> str:
+    test_config_path = Path("/tmp/resim/test_config.json")
+    if test_config_path.exists():
+        with open(test_config_path, "r") as f:
+            test_config = json.load(f)
+            return test_config["experienceLocation"]
+    else:
+        return str(Path("/tmp/resim/inputs/ground_truth.csv"))
+
+def detect_input_path_addendum(filename: str) -> str:
+    """Detect the correct addendum for input paths by checking file existence."""
+    global input_path_addendum
+    
+    if input_path_addendum is not None:
+        return input_path_addendum
+    
+    # Check if file exists in /tmp/resim/inputs
+    inputs_path = os.path.join("/tmp/resim/inputs", filename)
+    if os.path.isfile(inputs_path):
+        input_path_addendum = "/tmp/resim/inputs"
+        return input_path_addendum
+    
+    # Check if file exists in /dataset
+    dataset_path = os.path.join("/dataset", filename)
+    if os.path.isfile(dataset_path):
+        input_path_addendum = "/dataset"
+        return input_path_addendum
+    
+    # Default to /tmp/resim/inputs if neither exists
+    input_path_addendum = "/tmp/resim/inputs"
+    return input_path_addendum
+    
 def analyze_sequence(input_csv, output_path_base, threshold):
     df = pd.read_csv(input_csv)
     evaluated_rows = []
@@ -52,8 +89,9 @@ def analyze_sequence_v2(input_csv, output_path):
 
     for idx,row in df.iterrows():
         img_path = row['filename']
-        if not img_path.startswith("/tmp/resim/inputs"):
-            img_path = os.path.join("/tmp/resim/inputs", img_path)
+        if not img_path.startswith("/tmp/resim/inputs") and not img_path.startswith("/dataset"):
+            base_path = detect_input_path_addendum(img_path)
+            img_path = os.path.join(base_path, img_path)
 
         # exit early if the file doesnt exist
         if not os.path.isfile(img_path):
@@ -84,7 +122,7 @@ def analyze_sequence_v2(input_csv, output_path):
 
     output_csv = f"{output_path}.csv"
     pd.DataFrame(evaluated_rows).to_csv(output_csv, index=False)
-    print(f"✅ Saved: {output_csv}")
+    print(f"Saved: {output_csv}")
         
         
 
@@ -104,7 +142,7 @@ if __name__ == '__main__':
             print(f"Detected: bbox={box}, score={score.item():.2f}, label={label}")
         exit()
 
-    input_csv = '/tmp/resim/inputs/ground_truth.csv'
+    input_csv = get_experience_location()
     # Output folder
     output_folder = '/tmp/resim/outputs'
     os.makedirs(output_folder, exist_ok=True)
