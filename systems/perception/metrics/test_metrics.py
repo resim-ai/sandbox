@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from bounding_box import BoundingBox
 from fp_event_creator import create_fp_event_v2
 from fn_event_creator import create_fn_event
-from resim.metrics.python.metrics import ExternalFileMetricsData
+from resim.metrics.python.metrics import ExternalFileMetricsData,SeriesMetricsData
 
 
 from metric_charts import *
@@ -177,6 +177,33 @@ def calculate_summary_stats(match_result: MatchResults, min_confidence: float = 
     fn = match_result.total_gt - tp
     return SummaryMetrics(true_positives=tp, false_positives=fp, false_negatives=fn)
 
+def write_series_metrics_data(writer: rmw.ResimMetricsWriter, match_result: MatchResults):
+    """Create and write series metrics data for detection scores, true positives, and false positives."""
+    
+    # Create series data from match_result (convert to supported proto types)
+    scores_data = SeriesMetricsData(
+        name="Detection Score Series",
+        series=[float(score) for score in match_result.scores],
+        unit="Confidence"
+    )
+
+    tp_data = SeriesMetricsData(
+        name="True Positive Series",
+        series=[float(tp) for tp in match_result.tp],
+        unit="Count"
+    )
+
+    fp_data = SeriesMetricsData(
+        name="False Positive Series", 
+        series=[float(fp) for fp in match_result.fp],
+        unit="Count"
+    )
+    
+    # Write series metrics to writer using the SeriesMetricsData objects directly
+    writer.add_metrics_data(scores_data)
+    writer.add_metrics_data(tp_data)
+    writer.add_metrics_data(fp_data)
+
 # --- Main driver ---
 def run_test_metrics(writer: rmw.ResimMetricsWriter):
     csv_path = "/tmp/resim/inputs/logs/detections.csv"
@@ -188,6 +215,9 @@ def run_test_metrics(writer: rmw.ResimMetricsWriter):
     
     # tp, fp are both list of binaries containing either if they were true positive or false positive
     match_result = match_and_score(gt_dict, all_preds,writer,MIN_CONFIDENCE)
+    
+    # Create and write series metrics data
+    write_series_metrics_data(writer, match_result)
     
     print("Total Obstacles in the scene from Ground truth are:  ",match_result.total_gt)
     
