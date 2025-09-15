@@ -1,8 +1,5 @@
 FROM python:3.10-slim
 
-# Build argument to control local dataset copying
-ARG LOCAL=true
-
 WORKDIR /app
 
 COPY requirements.txt /tmp/requirements.txt
@@ -17,15 +14,11 @@ COPY experience_runner.py .
 # Create dataset directory
 RUN mkdir -p /dataset
 
-# Copy dataset (will be overridden by volume mounts in production)
+# Copy dataset (build script ensures ./dataset exists)
 COPY --chown=root:root ./dataset /dataset
 
-# Log the mode
-RUN if [ "$LOCAL" = "true" ]; then \
-        echo "Local Experience Mode"; \
-    else \
-        echo "Experience expected in S3"; \
-    fi
+# Dataset is copied from local folder (may be empty if using S3)
+RUN echo "Dataset copied to /dataset"
 
 RUN python experience_runner.py --test
 

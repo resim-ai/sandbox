@@ -1,5 +1,5 @@
 # Perception Case Study - Analyzing Object Detection System using ReSim
-The perception module of an autonomy system is responsible for taking sensor inputs and reasoning about where objects are in space, and where the ego vehicle or robot is relative to those objects. Many autonomy systems use cameras as a primary sensor for perception stacks, as they provide rich RGB information about the world. Deep learning models are trained using comprehensive image datasets to make inferences from camera data while the robot is operating in its environment.
+The perception module of an autonomy system is responsible for taking sensor inputs and reasoning about where objects are in space and where the ego vehicle or robot is relative to those objects. Many autonomy systems use cameras as a primary sensor for perception stacks as they provide rich RGB information about the world. Deep learning models are trained using comprehensive image datasets to make inferences from camera data while the robot is operating in its environment.
 
 ## Object Detection
 
@@ -34,12 +34,12 @@ This is the code for evaluation of models. In our case, we will look at simple e
 - number of False Negatives
 - Precision Recall Curve
 
-The actual list of metrics required to evaluate these models is much higher than the list above. The purpose is only to show the use case. The code for calculating these metrics can be found in `sandbox/systems/perception/metrics` folder in the sandbox repository. This code is similarly dockerized and pushed to an ECR and forms the [metrics-build](https://docs.resim.ai/setup/metrics-builds/).
+The actual list of metrics required to evaluate these models is much longer than the list above. The purpose is only to show the use case. The code for calculating these metrics can be found in `sandbox/systems/perception/metrics` folder in the sandbox repository. This code is similarly dockerized and pushed to an ECR and forms the [metrics-build](https://docs.resim.ai/setup/metrics-builds/).
 
 ### Step 3 - Registering with ReSim
 The substep before running includes using the Resim CLI to register the experience files in S3, the experience build and metrics build in ECR to Resim. Check the [Getting Started Docs](https://docs.resim.ai/setup/) for more info. 
 
-Once this is done, you can optionally create Test Suites (grouping experiences and metrics evaluation). But post this step, you are ready to run your tests on the cloud. 
+Once this is done, you can optionally create Test Suites (grouping experiences and metrics evaluation), but after this step, you are ready to run your tests on the cloud. 
 
 ### Step 4 - Running the Test
 The steps moving forward are fortunately very simple. All you need to do to run the test is, go to [ReSim Web App](https://app.resim.ai/), navigate to your project on the top right, and hit Run Tests.
@@ -53,7 +53,7 @@ The steps moving forward are fortunately very simple. All you need to do to run 
  ![](media/first_test_result.png)
 
 
-Click on the tests tab on the batch, to look at results from separate tests. Now one of the tests in this batch is called `Following Truck`, which contains images from a sequence of the ego vehicle following a truck in a highway. You would be able to see metrics from the results of the model running the input camera images. In this case, we added a list of images, which are false positives, the Precision Recall Curve, among other metrics. 
+Click on the tests tab on the batch, to look at results from separate tests. Now one of the tests in this batch is called `Following Truck`, which contains images from a sequence of the ego vehicle following a truck in a highway. You would be able to see metrics from the results of the model running the input camera images. In this case we added a list of images, which are false positives, the Precision Recall Curve, and other metrics. 
  ![](media/first_test_metrics.png)
 
  #### Events
@@ -68,15 +68,15 @@ Visualizing these events can provide a picture of how the model could be underpe
 ![](media/event_with_truck.png)
 
  ### Step 6 - Changing Model 
-When tuning models, there are many knobs that can be moved to change the performance. In our simple case, we are just going to change the threshold, and add Truck as a query in our general purpose model in the experience stage, build the docker container with the new setup, push to ECR, Connect it to resim using the CLI, and run the test. 
+When tuning models, there are many knobs that can be moved to change the performance. In our simple case, we are just going to change the threshold, and add Truck as a query in our general purpose model in the experience stage, build the docker image with the new setup, push to ECR, connect it to ReSim using the CLI, and run the test. 
 
 ### A/B compare
 Now that the new model is created, we can re-run a test with the new version, and once done, directly compare the runs between two versions to get a side by side comparison of results between two versions, on both the batch level and the test level
 
 ![](media/ABCompare.png)
 
-From the comparison view, we can see improved performance of the model, because  with the changes, and hence can conclude there were improvements. On a similar vein, we could also detect regressions. 
+From the comparison view, we can see improved performance of the model due to our changes. In a similar vein, we could also detect regressions, had they occured. 
 
 
 ## Conclusion
-In this doc, we went over how we could use resim to analyze a model, perform tweaks and check for improvement/regression as compared to the original version. Our customers use it as part of their Continuous Integration Nightly runs to ensure they flag regressions, as well as extensively in their development to tune and test their models in scale. 
+In this doc, we went over how we could use ReSim to analyze a model, perform tweaks and check for improvement/regression as compared to the original version. Our customers use it as part of their Continuous Integration Nightly runs to ensure they flag regressions, as well as extensively in their development to tune and test their models in scale. 
