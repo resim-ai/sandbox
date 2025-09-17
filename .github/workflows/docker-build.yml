@@ -119,9 +119,9 @@ jobs:
         run: |
           ./resim-cli projects select "${PROJECT_NAME}"
 
-      - name: Register ROS2 Talker Listener Build in ReSim
+      - name: Register Hello World Build in ReSim
         run: |
           export RESIM_HELLO_WORLD_IMAGE_TAG=${{ needs.build-push-hello-world.outputs.image_tag }}
           ./resim-cli builds create --image $RESIM_HELLO_WORLD_IMAGE_TAG \
-            --system $SIM_SYSTEM --name "ROS2 MCB Build" --description "A simple hello-world example" \
+            --system $SIM_SYSTEM --name "Hello World Build" --description "A simple hello-world example" \
             --version "${{ env.COMMIT_SHA }}" --branch "${{ env.BRANCH_NAME }}" --auto-create-branch
