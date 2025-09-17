@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  BUILD_REPO_NAME: customer-test-images
+  BUILD_REPO_NAME: core
   REGISTRY_NAME: 909785973729.dkr.ecr.us-east-1.amazonaws.com
   RESIM_PASSWORD: ${{ secrets.RESIM_PASSWORD }}
   RESIM_USERNAME: ${{ secrets.RESIM_USERNAME }}
