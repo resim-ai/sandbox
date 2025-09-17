@@ -119,7 +119,7 @@ jobs:
 
       - name: Select Project
         run: |
-          ./resim-cli projects select "${PROJECT_NAME}"
+          ./resim-cli --auth-url ${AUTH_URL} --url ${API_URL} projects select "${PROJECT_NAME}"
 
       - name: Register Hello World Build in ReSim
         run: |
