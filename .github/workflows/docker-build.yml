@@ -127,4 +127,4 @@ jobs:
             --version "${{ env.COMMIT_SHA }}" --branch "${{ env.BRANCH_NAME }}" --auto-create-branch --github >> $GITHUB_ENV
       - name: Run metrics 2.0 batch
         run: |
-          resim batch create --build-id ${build_id} --experiences "asdfadsf" --pool-labels "resim:metrics2:k8s"
+          ./resim-cli batch create --build-id ${build_id} --experiences "asdfadsf" --pool-labels "resim:metrics2:k8s"
