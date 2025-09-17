@@ -37,6 +37,7 @@ def compute_sine(args: float, iterations: int):
 
 def main():
     config: ExperienceConfig = load_experience()
+
     print("Hello, world!")
     compute_sine(config.arguments, config.num_iterations)
 
