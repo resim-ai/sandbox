@@ -25,7 +25,7 @@ def compute_sine(args: list[float], iterations: int):
             terms = [term / j for term in terms]
         for ii, t in enumerate(terms):
             sums[ii] += t
-            emit("partial_sums", {"arg": args[ii], "sum": sums[ii]})
+            emit("partial_sums", {"iter": ii, "arg": args[ii], "sum": sums[ii]})
             
         NS_PER_STEP = 1000000000
         log.append({ "iteration": i, "partial_sums": copy.deepcopy(sums), "time": NS_PER_STEP * i})

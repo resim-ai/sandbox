@@ -1,0 +1,8 @@
+version: 1
+
+topics:
+  partial_sums:
+    schema:
+      iter: int
+      arg: float
+      sum: float
