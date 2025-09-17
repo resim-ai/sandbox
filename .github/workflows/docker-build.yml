@@ -124,4 +124,7 @@ jobs:
           export RESIM_HELLO_WORLD_IMAGE_TAG=${{ needs.build-push-hello-world.outputs.image_tag }}
           ./resim-cli builds create --image $RESIM_HELLO_WORLD_IMAGE_TAG \
             --system $SIM_SYSTEM --name "Hello World Build" --description "A simple hello-world example" \
-            --version "${{ env.COMMIT_SHA }}" --branch "${{ env.BRANCH_NAME }}" --auto-create-branch
+            --version "${{ env.COMMIT_SHA }}" --branch "${{ env.BRANCH_NAME }}" --auto-create-branch --github >> $GITHUB_ENV
+      - name: Run metrics 2.0 batch
+        run: |
+          resim batch create --build-id ${build_id} --experiences "asdfadsf" --pool-labels "resim:metrics2:k8s"
