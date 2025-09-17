@@ -12,6 +12,8 @@ env:
   RESIM_USERNAME: ${{ secrets.RESIM_USERNAME }}
   PROJECT_NAME: Demo Experience Syncing
   SIM_SYSTEM: demo_system
+  AUTH_URL: https://resim-dev.us.auth0.com
+  API_URL: https://api.resim.io/v1/
 
 permissions:
   id-token: write
@@ -122,9 +124,9 @@ jobs:
       - name: Register Hello World Build in ReSim
         run: |
           export RESIM_HELLO_WORLD_IMAGE_TAG=${{ needs.build-push-hello-world.outputs.image_tag }}
-          ./resim-cli builds create --image $RESIM_HELLO_WORLD_IMAGE_TAG \
+          ./resim-cli --auth-url ${AUTH_URL} --url ${API_URL} builds create --image $RESIM_HELLO_WORLD_IMAGE_TAG \
             --system $SIM_SYSTEM --name "Hello World Build" --description "A simple hello-world example" \
             --version "${{ env.COMMIT_SHA }}" --branch "${{ env.BRANCH_NAME }}" --auto-create-branch --github >> $GITHUB_ENV
       - name: Run metrics 2.0 batch
         run: |
-          ./resim-cli batch create --build-id ${build_id} --experiences "asdfadsf" --pool-labels "resim:metrics2:k8s"
+          ./resim-cli --auth-url ${AUTH_URL} --url ${API_URL} batch create --build-id ${build_id} --experiences "asdfadsf" --pool-labels "resim:metrics2:k8s" --metrics-set "hello metrics"
