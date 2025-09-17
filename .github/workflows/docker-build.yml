@@ -10,7 +10,7 @@ env:
   REGISTRY_NAME: public.ecr.aws/resim
   RESIM_PASSWORD: ${{ secrets.RESIM_PASSWORD }}
   RESIM_USERNAME: ${{ secrets.RESIM_USERNAME }}
-  PROJECT_NAME: mgrijalva metrics 2 testing
+  PROJECT_NAME: "mgrijalva metrics 2 testing"
   SIM_SYSTEM: SYSTEM
   AUTH_URL: https://resim-dev.us.auth0.com
   API_URL: https://api.resim.io/v1/
@@ -119,6 +119,7 @@ jobs:
 
       - name: Select Project
         run: |
+          ./resim-cli --auth-url ${AUTH_URL} --url ${API_URL} projects list
           ./resim-cli --auth-url ${AUTH_URL} --url ${API_URL} projects select "${PROJECT_NAME}"
 
       - name: Register Hello World Build in ReSim
