@@ -122,6 +122,6 @@ jobs:
       - name: Register ROS2 Talker Listener Build in ReSim
         run: |
           export RESIM_TALKER_LISTENER_IMAGE_TAG=${{ needs.build-push-ros2-talker-listener.outputs.image_tag }}
-          ./resim-cli builds create --build-spec ./builds/docker-compose.yml --use-os-env \
+          ./resim-cli builds create --build-spec ./systems/ros2_talker_listener/docker-compose.yml --use-os-env \
             --system $SIM_SYSTEM --name "ROS2 MCB Build" --description "A simple ROS2 talker/listener MCB example" \
             --version "${{ env.COMMIT_SHA }}" --branch "${{ env.BRANCH_NAME }}" --auto-create-branch
