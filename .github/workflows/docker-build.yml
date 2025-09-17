@@ -117,7 +117,7 @@ jobs:
 
       - name: Select Project
         run: |
-          ./resim-cli projects select $PROJECT_NAME
+          ./resim-cli projects select "${PROJECT_NAME}"
 
       - name: Register ROS2 Talker Listener Build in ReSim
         run: |
