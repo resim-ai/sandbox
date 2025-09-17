@@ -38,12 +38,6 @@ jobs:
         with:
           registry: ${{ env.REGISTRY_NAME }}
 
-      - name: Verify AWS identity
-        run: aws sts get-caller-identity
-
-      - name: Verify ECR repository exists
-        run: aws ecr describe-repositories --repository-names ${{ env.BUILD_REPO_NAME }} --region us-east-1
-
       - name: Docker metadata
         id: docker_meta
         uses: docker/metadata-action@v5
