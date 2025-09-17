@@ -1,0 +1,78 @@
+name: Build, Push & Execute Images
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+env:
+  BUILD_REPO_NAME: customer-test-images
+  REGISTRY_NAME: 909785973729.dkr.ecr.us-east-1.amazonaws.com
+  RESIM_PASSWORD: ${{ secrets.RESIM_PASSWORD }}
+  RESIM_USERNAME: ${{ secrets.RESIM_USERNAME }}
+  PROJECT_NAME: Demo Experience Syncing
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  build-push-ros2-talker-listener:
+    name: Create & Push New ROS2 Talker/Listener Build Image
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.get_image_tag.outputs.image_tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.ECR_RW_ROLE }}
+          aws-region: us-east-1
+
+      - name: Log in to ECR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY_NAME }}
+
+      - name: Docker metadata
+        id: docker_meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ env.REGISTRY_NAME }}/${{ env.BUILD_REPO_NAME }}
+          tags: |
+            type=ref,event=branch,prefix=sandbox-ros2-mcb-
+            type=ref,event=pr,prefix=sandbox-ros2-mcb-pr-
+            type=sha,prefix=sandbox-ros2-mcb-
+
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          base: ${{ github.ref }}
+          filters: |
+            ros2_talker_listener:
+              - systems/ros2_talker_listener/**
+
+      - name: Set up Docker Buildx
+        if: ${{ github.event_name != 'pull_request' || steps.filter.outputs.ros2_talker_listener == 'true'}}
+        uses: docker/setup-buildx-action@v3
+
+      - name: Docker Build Push
+        if: ${{ github.event_name != 'pull_request' || steps.filter.outputs.ros2_talker_listener == 'true'}}
+        id: build-push-build
+        uses: docker/build-push-action@v5
+        with:
+          context: systems/ros2_talker_listener
+          file: talker_listener.dockerfile
+          push: true
+          tags: ${{ steps.docker_meta.outputs.tags }}
+
+      - name: Get Image Tag
+        id: get_image_tag
+        run: |
+          export IMAGE_URL=$(echo "${{ steps.docker_meta.outputs.tags }}" | tail -n 1)
+          echo "image_tag=$IMAGE_URL" >> $GITHUB_OUTPUT
