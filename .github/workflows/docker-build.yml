@@ -6,8 +6,8 @@ on:
       - main
 
 env:
-  BUILD_REPO_NAME: drone-simulator
-  REGISTRY_NAME: 909785973729.dkr.ecr.us-east-1.amazonaws.com
+  BUILD_REPO_NAME: core
+  REGISTRY_NAME: public.ecr.aws/resim
   RESIM_PASSWORD: ${{ secrets.RESIM_PASSWORD }}
   RESIM_USERNAME: ${{ secrets.RESIM_USERNAME }}
   PROJECT_NAME: Demo Experience Syncing
