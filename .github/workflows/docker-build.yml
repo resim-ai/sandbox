@@ -66,8 +66,8 @@ jobs:
         id: build-push-build
         uses: docker/build-push-action@v5
         with:
-          context: systems/ros2_talker_listener
-          file: talker_listener.dockerfile
+          context: ./systems/ros2_talker_listener
+          file: ./systems/ros2_talker_listener/talker_listener.dockerfile
           push: true
           tags: ${{ steps.docker_meta.outputs.tags }}
 
