@@ -2,6 +2,7 @@
 
 import json
 from dataclasses import dataclass
+from resim.metrics.python.emissions import emit
 import copy
 
 @dataclass
@@ -11,12 +12,8 @@ class ExperienceConfig:
 
 EXPERIENCE_PATH = "/tmp/resim/inputs/experience.json"
 
-def load_experience() -> ExperienceConfig:
-    with open(EXPERIENCE_PATH, "r") as f:
-        config_json = json.load(f)
-    return ExperienceConfig(**config_json)
 
-def compute_sine(args: float, iterations: int):
+def compute_sine(args: list[float], iterations: int):
     log = []
 
     sums = [0.0] * len(args)
@@ -28,15 +25,21 @@ def compute_sine(args: float, iterations: int):
             terms = [term / j for term in terms]
         for ii, t in enumerate(terms):
             sums[ii] += t
-
+            emit("partial_sums", {"arg": args[ii], "sum": sums[ii]})
+            
         NS_PER_STEP = 1000000000
         log.append({ "iteration": i, "partial_sums": copy.deepcopy(sums), "time": NS_PER_STEP * i})
+
+        
 
     with open("/tmp/resim/outputs/log.json", "w") as l:
         json.dump(log, l)
 
 def main():
-    config: ExperienceConfig = load_experience()
+    config = ExperienceConfig(
+        arguments = [0.5, 0.6],
+        num_iterations = 5,
+    )
 
     print("Hello, world!")
     compute_sine(config.arguments, config.num_iterations)
