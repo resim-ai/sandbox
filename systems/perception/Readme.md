@@ -1,11 +1,11 @@
 # Perception Case Study
 
 This document will provide an example of how to use the ReSim Cloud Platform to test a robotic system's Perception module. The example that
-we will talk about in this document is specifically the Object Detection Module of a Self Driving Car's Perception system. Check [Blog Folder](./blog/Readme.md) for a detailed explanation.
+we will talk about in this document is specifically the Object Detection Module of a Self Driving Car's Perception system. Check the [blog](https://www.resim.ai/blog/perception-case-study-analyzing-object-detection-systems-using-resim) for a detailed explanation.
 
 ## Experience Build
 
-The experience stage is actually running the model ([OWL Vit model](https://huggingface.co/docs/transformers/en/model_doc/owlvit)) on the dataset. We have a sample of 10 images from the Audi A2D2 dataset in the `experience/samples` directory. To build the experience docker container with the entrypoint required to run on the cloud, use
+The experience stage is actually running the model ([OWL Vit model](https://huggingface.co/docs/transformers/en/model_doc/owlvit)) on the dataset. We have a sample of 10 images from the [Audi A2D2 dataset](https://www.a2d2.audi/en/dataset/) in the `experience/samples` directory, which are released under CC BY-ND 4.0 license. To build the experience docker container with the entrypoint required to run on the cloud, use
 
     cd experience
     ./build_experience.sh

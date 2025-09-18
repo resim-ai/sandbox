@@ -8,7 +8,7 @@ class BoundingBox:
         self.score = score
         self.matched = False
 
-    def iou(self, other: 'BoundingBox') -> float:
+    def iou(self, other: "BoundingBox") -> float:
         xi1, yi1 = max(self.xmin, other.xmin), max(self.ymin, other.ymin)
         xi2, yi2 = min(self.xmax, other.xmax), min(self.ymax, other.ymax)
         inter_area = max(0, xi2 - xi1) * max(0, yi2 - yi1)

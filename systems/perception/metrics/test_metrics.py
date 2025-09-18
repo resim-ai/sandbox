@@ -8,8 +8,8 @@ from dataclasses import dataclass
 from bounding_box import BoundingBox
 from fp_event_creator import create_fp_event_v2
 from fn_event_creator import create_fn_event
-from resim.metrics.python.metrics import ExternalFileMetricsData,SeriesMetricsData
-
+from resim.metrics.python.metrics import ExternalFileMetricsData, SeriesMetricsData
+import numpy as np
 
 from metric_charts import *
 
@@ -21,38 +21,41 @@ IN_ROOT_PATH = Path("/tmp/resim/inputs")
 # Global variable for input path addendum
 input_path_addendum = None
 
+
 def detect_input_path_addendum(filename: str) -> str:
     """Detect the correct addendum for input paths by checking file existence."""
     global input_path_addendum
-    
+
     if input_path_addendum is not None:
         return input_path_addendum
-    
+
     # Check if file exists in /tmp/resim/inputs/experience
     experience_path = os.path.join("/tmp/resim/inputs/experience", filename)
     if os.path.isfile(experience_path):
         input_path_addendum = "/tmp/resim/inputs/experience"
         return input_path_addendum
-    
+
     # Check if file exists in /dataset
     dataset_path = os.path.join("/dataset", filename)
     if os.path.isfile(dataset_path):
         input_path_addendum = "/dataset"
         return input_path_addendum
-    
+
     # Default to /tmp/resim/inputs/experience if neither exists
     input_path_addendum = "/tmp/resim/inputs/experience"
     return input_path_addendum
 
+
 @dataclass
 class MatchResults:
-    tp: List[int] # a vector of detection results with 1 if true positive and 0 if not
-    fp: List[int] # a vector of detection results with 1 if false positive and 9 if not
-    scores: List[float] # confidence scores for every result
-    total_gt: int # Total detections present in the ground truth (needed for false negatives calc)
-    unmatched_gt: Dict[Path, List[BoundingBox]] 
+    tp: List[int]  # a vector of detection results with 1 if true positive and 0 if not
+    fp: List[int]  # a vector of detection results with 1 if false positive and 9 if not
+    scores: List[float]  # confidence scores for every result
+    total_gt: int  # Total detections present in the ground truth (needed for false negatives calc)
+    unmatched_gt: Dict[Path, List[BoundingBox]]
     fp_images: List[ExternalFileMetricsData]
-    
+
+
 @dataclass
 class SummaryMetrics:
     true_positives: int
@@ -63,23 +66,30 @@ class SummaryMetrics:
 # --- Parsing helpers ---
 def parse_boxes(box_str: str, is_prediction: bool) -> List[BoundingBox]:
     box_list = ast.literal_eval(box_str)
-    return [BoundingBox(b["bbox"], b["class"], b.get("score") if is_prediction else None) for b in box_list]
+    return [
+        BoundingBox(b["bbox"], b["class"], b.get("score") if is_prediction else None)
+        for b in box_list
+    ]
 
-def load_csv(csv_path: str) -> Tuple[Dict[str, List[BoundingBox]], List[Tuple[str, BoundingBox]]]:
-    '''
-    LoadCSV returns a tuple containing 
+
+def load_csv(
+    csv_path: str,
+) -> Tuple[Dict[str, List[BoundingBox]], List[Tuple[str, BoundingBox]]]:
+    """
+    LoadCSV returns a tuple containing
     1. a dict {filename: [GT bounding box]}
     2. [(filename, pred_bbox)] - Each prediction is sepearately formed in a list so we can sort by confidence
-    '''
+    """
     df = pd.read_csv(csv_path)
     gt_dict, all_preds = {}, []
 
     for _, row in df.iterrows():
         relative_path = Path(row["filename"])
-        
 
         # If path is absolute and under /tmp/resim/inputs, make it relative to that root
-        if relative_path.is_absolute() and str(relative_path).startswith(str(IN_ROOT_PATH)):
+        if relative_path.is_absolute() and str(relative_path).startswith(
+            str(IN_ROOT_PATH)
+        ):
             relative_path = relative_path.relative_to(IN_ROOT_PATH)
 
         # Use path detection to determine the correct base path
@@ -95,8 +105,7 @@ def load_csv(csv_path: str) -> Tuple[Dict[str, List[BoundingBox]], List[Tuple[st
 
 
 def compile_unmatched_gt_boxes(
-    gt_dict: Dict[Path, List[BoundingBox]],
-    matched: Dict[Path, List[bool]]
+    gt_dict: Dict[Path, List[BoundingBox]], matched: Dict[Path, List[bool]]
 ) -> Dict[Path, List[BoundingBox]]:
     """
     Extracts all unmatched ground truth bounding boxes.
@@ -111,23 +120,23 @@ def compile_unmatched_gt_boxes(
     unmatched_gt = {}
     for img, gt_list in gt_dict.items():
         unmatched_boxes = [
-            box for idx, box in enumerate(gt_list)
-            if not matched[img][idx]
+            box for idx, box in enumerate(gt_list) if not matched[img][idx]
         ]
         if unmatched_boxes:
             unmatched_gt[img] = unmatched_boxes
     return unmatched_gt
+
 
 # --- Evaluation ---
 def match_and_score(
     gt_dict: Dict[str, List[BoundingBox]],
     all_preds: List[Tuple[str, BoundingBox]],
     writer: Optional[rmw.ResimMetricsWriter] = None,
-    min_detection_conf: float = 0.45
+    min_detection_conf: float = 0.45,
 ) -> MatchResults:
     all_preds.sort(key=lambda x: x[1].score or 0, reverse=True)
     tp, fp, scores = [], [], []
-    fp_images = [] # for false positive image carousel
+    fp_images = []  # for false positive image carousel
     # mark every gt img as not matched
     matched = {img: [False] * len(gt_list) for img, gt_list in gt_dict.items()}
 
@@ -147,22 +156,31 @@ def match_and_score(
             matched[img][match_idx] = True
         else:
             tp.append(0)
-            fp.append(1) # This happens for either duplicates or not matches. TODO - maybe handle duplicates differently
+            fp.append(
+                1
+            )  # This happens for either duplicates or not matches. TODO - maybe handle duplicates differently
 
-            fp_num += 1 
+            fp_num += 1
             if writer is not None and score >= min_detection_conf:
                 # add_fp_image_event(writer, img)
                 print(f"False positive detected at img: {img}")
-                img_data = create_fp_event_v2(writer,img,OUT_PATH,pred_box)
+                img_data = create_fp_event_v2(writer, img, OUT_PATH, pred_box)
                 fp_images.append(img_data)
-                
+
             else:
                 print(f"Score on img : {img} is : {score}")
 
-
-    unmatched_gt = compile_unmatched_gt_boxes(gt_dict,matched)
+    unmatched_gt = compile_unmatched_gt_boxes(gt_dict, matched)
     total_gt = sum(len(v) for v in gt_dict.values())
-    return MatchResults(tp=tp, fp=fp, scores=scores, total_gt=total_gt, unmatched_gt=unmatched_gt, fp_images=fp_images)
+    return MatchResults(
+        tp=tp,
+        fp=fp,
+        scores=scores,
+        total_gt=total_gt,
+        unmatched_gt=unmatched_gt,
+        fp_images=fp_images,
+    )
+
 
 # --- PR Curve Calculation ---
 def compute_pr_curve(match_result: MatchResults) -> Tuple[List[float], List[float]]:
@@ -171,38 +189,53 @@ def compute_pr_curve(match_result: MatchResults) -> Tuple[List[float], List[floa
     recall = tp_cum / (match_result.total_gt + 1e-8)
     return precision.tolist(), recall.tolist()
 
-def calculate_summary_stats(match_result: MatchResults, min_confidence: float = 0.45) -> SummaryMetrics:
-    tp = sum(tp for tp, score in zip(match_result.tp, match_result.scores) if score >= min_confidence)
-    fp = sum(fp for fp, score in zip(match_result.fp, match_result.scores) if score >= min_confidence)
+
+def calculate_summary_stats(
+    match_result: MatchResults, min_confidence: float = 0.45
+) -> SummaryMetrics:
+    tp = sum(
+        tp
+        for tp, score in zip(match_result.tp, match_result.scores)
+        if score >= min_confidence
+    )
+    fp = sum(
+        fp
+        for fp, score in zip(match_result.fp, match_result.scores)
+        if score >= min_confidence
+    )
     fn = match_result.total_gt - tp
     return SummaryMetrics(true_positives=tp, false_positives=fp, false_negatives=fn)
 
-def write_series_metrics_data(writer: rmw.ResimMetricsWriter, match_result: MatchResults):
+
+def write_series_metrics_data(
+    writer: rmw.ResimMetricsWriter, match_result: MatchResults
+):
     """Create and write series metrics data for detection scores, true positives, and false positives."""
-    
+
     # Create series data from match_result (convert to supported proto types)
     scores_data = SeriesMetricsData(
         name="Detection Score Series",
         series=[float(score) for score in match_result.scores],
-        unit="Confidence"
+        unit="Confidence",
     )
 
     tp_data = SeriesMetricsData(
         name="True Positive Series",
         series=[float(tp) for tp in match_result.tp],
-        unit="Count"
+        unit="Count",
     )
 
     fp_data = SeriesMetricsData(
-        name="False Positive Series", 
+        name="False Positive Series",
         series=[float(fp) for fp in match_result.fp],
-        unit="Count"
+        unit="Count",
     )
-    
+
     # Write series metrics to writer using the SeriesMetricsData objects directly
     writer.add_metrics_data(scores_data)
     writer.add_metrics_data(tp_data)
     writer.add_metrics_data(fp_data)
+
 
 # --- Main driver ---
 def run_test_metrics(writer: rmw.ResimMetricsWriter):
@@ -210,49 +243,58 @@ def run_test_metrics(writer: rmw.ResimMetricsWriter):
     print("This is the latest run")
     print("Loading the CSV")
     gt_dict, all_preds = load_csv(csv_path)
-    
+
     print("Calculating IOU and matching detections")
-    
+
     # tp, fp are both list of binaries containing either if they were true positive or false positive
-    match_result = match_and_score(gt_dict, all_preds,writer,MIN_CONFIDENCE)
-    
+    match_result = match_and_score(gt_dict, all_preds, writer, MIN_CONFIDENCE)
+
     # Create and write series metrics data
     write_series_metrics_data(writer, match_result)
-    
-    print("Total Obstacles in the scene from Ground truth are:  ",match_result.total_gt)
-    
+
+    print(
+        "Total Obstacles in the scene from Ground truth are:  ", match_result.total_gt
+    )
+
     # Log events for all false negatives
     # For each unmatched GT box, create a false negative event
     for img_path, unmatched_boxes in match_result.unmatched_gt.items():
         # Gather all predictions for this image (used to show context in event)
         pred_boxes = [box for (fname, box) in all_preds if fname == img_path]
 
-        
         print(f"False negative(s) detected at img: {img_path}")
         create_fn_event(writer, str(img_path), OUT_PATH, unmatched_boxes, pred_boxes)
-        
+
     # All false positives
     if match_result.fp_images:
-        add_fp_image_list(writer,match_result.fp_images)
-        
-    
+        add_fp_image_list(writer, match_result.fp_images)
+
     # Prompt to chatgpt:name this calculate_summary_stats(match_result) and name a class SummaryMetrics with the below three values
     summary_metrics = calculate_summary_stats(match_result, MIN_CONFIDENCE)
-    
-    
+
     # Computing Precision and Recall
     precision, recall = compute_pr_curve(match_result)
-    
-    add_summary_table_metric(writer, len(all_preds), summary_metrics.true_positives, summary_metrics.false_positives, summary_metrics.false_negatives)
-    
-    add_scalar_metrics(writer, summary_metrics.false_positives, summary_metrics.true_positives, summary_metrics.false_negatives)
-    
+
+    add_summary_table_metric(
+        writer,
+        len(all_preds),
+        summary_metrics.true_positives,
+        summary_metrics.false_positives,
+        summary_metrics.false_negatives,
+    )
+
+    add_scalar_metrics(
+        writer,
+        summary_metrics.false_positives,
+        summary_metrics.true_positives,
+        summary_metrics.false_negatives,
+    )
+
     print("Precision-Recall Curve:")
     for p, r in zip(precision, recall):
         print(f"Precision: {p:.3f}, Recall: {r:.3f}")
     if precision:
         print(f"\nFinal Precision@Recall=1: {precision[-1]:.3f}")
-        
-    add_precision_recall_curve(writer,precision,recall)
+
+    add_precision_recall_curve(writer, precision, recall)
     print("Finished Running Test Metrics")
-    

@@ -6,18 +6,21 @@ from resim.metrics.python import metrics_writer as rmw
 from bounding_box import BoundingBox
 from image_writer import write_image_with_bbox
 from resim.metrics.python.metrics import (
-  ExternalFileMetricsData,      
-  MetricStatus,
-  MetricImportance
+    ExternalFileMetricsData,
+    MetricStatus,
+    MetricImportance,
 )
 
 METRIC_IMAGES_DIRNAME = "metric_images"
 
-def save_image_with_bbox(image_path: str, out_dir: Path, pred_box: BoundingBox) -> ExternalFileMetricsData:
-    '''
+
+def save_image_with_bbox(
+    image_path: str, out_dir: Path, pred_box: BoundingBox
+) -> ExternalFileMetricsData:
+    """
     Function takes the path to the input image, and then embeds the bounding box and saves it to file and generates
     an returns an `ExternalFileMetricsData` object, which can be used to add the image to the ReSim Web UI for events
-    '''
+    """
     dest_dir = out_dir / METRIC_IMAGES_DIRNAME
     dest_dir.mkdir(parents=True, exist_ok=True)
 
@@ -33,7 +36,12 @@ def save_image_with_bbox(image_path: str, out_dir: Path, pred_box: BoundingBox) 
     )
 
 
-def create_fp_event_v2(writer: rmw.ResimMetricsWriter, image_path: str, out_dir: Path, pred_box: BoundingBox) -> ExternalFileMetricsData:
+def create_fp_event_v2(
+    writer: rmw.ResimMetricsWriter,
+    image_path: str,
+    out_dir: Path,
+    pred_box: BoundingBox,
+) -> ExternalFileMetricsData:
     """
     Create a Resim event for a false positive detection by attaching the raw image.
 
@@ -41,7 +49,7 @@ def create_fp_event_v2(writer: rmw.ResimMetricsWriter, image_path: str, out_dir:
         writer: The ResimMetricsWriter instance.
         image_path: Absolute path to the false positive image.
         out_dir: Base output directory for Resim metrics (e.g., /tmp/resim/outputs)
-        
+
     Returns:
         External Metrics data for the file stored for false positive
     """
@@ -49,9 +57,9 @@ def create_fp_event_v2(writer: rmw.ResimMetricsWriter, image_path: str, out_dir:
     image_data = save_image_with_bbox(image_path, out_dir, pred_box)
     img_path = Path(image_path)
     hash = uuid.uuid4().hex
-    metric = create_image_metric(writer, img_path, image_data ,hash)
+    metric = create_image_metric(writer, img_path, image_data, hash)
     create_event(writer, img_path, metric, hash)
-    
+
     return image_data
 
 
@@ -90,7 +98,7 @@ def create_image_metric(
     Create an image list metric for the given image.
     """
     return (
-        writer.add_image_metric(name=f"False Positive Image")
+        writer.add_image_metric(name="False Positive Image")
         .with_description(f"False positive detected at image {img_path.stem}")
         .with_status(MetricStatus.FAIL_WARN_METRIC_STATUS)
         .with_importance(MetricImportance.MEDIUM_IMPORTANCE)

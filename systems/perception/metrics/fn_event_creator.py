@@ -3,14 +3,22 @@ from typing import List
 from bounding_box import BoundingBox
 from resim.metrics.python import metrics_writer as rmw
 from resim.metrics.python import metrics_utils as mu
-from resim.metrics.python.metrics import ExternalFileMetricsData,ImageMetric,MetricStatus, MetricImportance
+from resim.metrics.python.metrics import (
+    ExternalFileMetricsData,
+    ImageMetric,
+    MetricStatus,
+    MetricImportance,
+)
 import cv2
 
 # Constants
 FN_GT_IMAGE_DIRNAME = "fn_images/gt"
 FN_PRED_IMAGE_DIRNAME = "fn_images/pred"
 
-def save_gt_image_with_bboxes(image_path: str, out_dir: Path, gt_boxes: List[BoundingBox]) -> ExternalFileMetricsData:
+
+def save_gt_image_with_bboxes(
+    image_path: str, out_dir: Path, gt_boxes: List[BoundingBox]
+) -> ExternalFileMetricsData:
     """
     Save the ground truth image with all unmatched GT boxes in red.
     """
@@ -38,7 +46,10 @@ def save_gt_image_with_bboxes(image_path: str, out_dir: Path, gt_boxes: List[Bou
         filename=str(dest_path.relative_to(out_dir)),
     )
 
-def save_pred_image_with_bboxes(image_path: str, out_dir: Path, pred_boxes: List[BoundingBox]) -> ExternalFileMetricsData:
+
+def save_pred_image_with_bboxes(
+    image_path: str, out_dir: Path, pred_boxes: List[BoundingBox]
+) -> ExternalFileMetricsData:
     """
     Save the prediction image with all predicted boxes (green).
     """
@@ -66,6 +77,7 @@ def save_pred_image_with_bboxes(image_path: str, out_dir: Path, pred_boxes: List
         filename=str(dest_path.relative_to(out_dir)),
     )
 
+
 def create_fn_image_metrics(
     writer: rmw.ResimMetricsWriter,
     img_path: Path,
@@ -77,7 +89,7 @@ def create_fn_image_metrics(
     Returns a list of metrics.
     """
     gt_metric = (
-        writer.add_image_metric(name=f"False Negative Ground Truth")
+        writer.add_image_metric(name="False Negative Ground Truth")
         .with_description(f"Unmatched Ground truth in image {img_path.stem}")
         .with_status(MetricStatus.FAIL_WARN_METRIC_STATUS)
         .with_importance(MetricImportance.MEDIUM_IMPORTANCE)
@@ -88,7 +100,7 @@ def create_fn_image_metrics(
     )
 
     pred_metric = (
-        writer.add_image_metric(name=f"False Negative Predictions")
+        writer.add_image_metric(name="False Negative Predictions")
         .with_description(f"All predictions for image {img_path.stem} (missed GTs)")
         .with_status(MetricStatus.FAIL_WARN_METRIC_STATUS)
         .with_importance(MetricImportance.LOW_IMPORTANCE)
@@ -100,15 +112,16 @@ def create_fn_image_metrics(
 
     return [gt_metric, pred_metric]
 
+
 def create_fn_event(
     writer: rmw.ResimMetricsWriter,
     image_path: str,
     out_dir: Path,
     gt_boxes: List[BoundingBox],
-    pred_boxes: List[BoundingBox]
+    pred_boxes: List[BoundingBox],
 ):
     """
-    Main entry point to create a false negative event. 
+    Main entry point to create a false negative event.
     Saves annotated GT/pred images, builds metrics, and attaches event to Resim.
     """
     img_path = Path(image_path)
@@ -118,7 +131,9 @@ def create_fn_event(
     pred_image_data = save_pred_image_with_bboxes(image_path, out_dir, pred_boxes)
 
     # Create image metrics
-    image_metrics = create_fn_image_metrics(writer, img_path, gt_image_data, pred_image_data)
+    image_metrics = create_fn_image_metrics(
+        writer, img_path, gt_image_data, pred_image_data
+    )
 
     # Attach event
     (
