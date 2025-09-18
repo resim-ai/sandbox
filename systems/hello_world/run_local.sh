@@ -17,8 +17,8 @@ docker run -it \
 
 # Run the metrics image. Note how the logs in OUTDIR are needed in the
 # /tmp/resim/inputs/logs folder for this step.
-docker run -it \
-       --volume "${EXPDIR}:/tmp/resim/inputs/experience" \
-       --volume "${OUTDIR}:/tmp/resim/inputs/logs" \
-       --volume "${OUTDIR}:/tmp/resim/outputs" \
-       hello_world_metrics:latest
+#docker run -it \
+#       --volume "${EXPDIR}:/tmp/resim/inputs/experience" \
+#       --volume "${OUTDIR}:/tmp/resim/inputs/logs" \
+#       --volume "${OUTDIR}:/tmp/resim/outputs" \
+#       hello_world_metrics:latest

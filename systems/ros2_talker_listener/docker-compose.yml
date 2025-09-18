@@ -1,0 +1,41 @@
+services:
+  talker:
+    extends:
+      file: docker-compose.base.yml
+      service: talker_listener
+    container_name: ros2_talker
+    command: >
+      bash -c "source /opt/ros/humble/setup.bash &&
+               ros2 run demo_nodes_py talker"
+    depends_on:
+      - listener
+      - rosbag
+
+  listener:
+    extends:
+      file: docker-compose.base.yml
+      service: talker_listener
+    container_name: ros2_listener
+    depends_on:
+      - rosbag
+    command: >
+      bash -c "source /opt/ros/humble/setup.bash &&
+               ros2 run demo_nodes_py listener"
+
+  rosbag:
+    extends:
+      file: docker-compose.base.yml
+      service: talker_listener
+    container_name: ros2_rosbag
+    command: >
+      bash -c "source /opt/ros/humble/setup.bash &&
+               ros2 bag record /chatter -o /tmp/resim/outputs/mcb_log/ --storage mcap"
+  orchestrator:
+    image: public.ecr.aws/docker/library/busybox:latest
+    container_name: wait_60_seconds
+    command: sleep 60
+    labels:
+      resim.ai/isTestOrchestrator: true
+    depends_on:
+      - listener
+      - talker

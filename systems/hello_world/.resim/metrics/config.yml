@@ -1,0 +1,22 @@
+version: 1
+
+topics:
+  partial_sums:
+    schema:
+      iter: int
+      arg: float
+      sum: float
+
+metrics:
+  Value over iteration:
+    type: test
+    description: Value over iteration plot
+    query_string: SELECT 'value' as group_name, iter, "sum" from partial_sums
+    template_type: system
+    template: line
+
+
+metrics sets:
+  hello metrics:
+    metrics:
+      - Value over iteration
