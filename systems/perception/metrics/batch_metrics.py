@@ -239,10 +239,11 @@ def run_batch_metrics():
         )
 
         # Add a summary text metric
-        summary = f"""- Total False Positives: {total_fp}
-                      - Total True Positives: {total_tp} 
-                      - Total False Negatives: {total_fn}
-            """
+        summary = (
+            f"- Total False Positives: {total_fp}\n"
+            f"- Total True Positives: {total_tp}\n"
+            f"- Total False Negatives: {total_fn}"
+        )
 
         (
             metrics_writer.add_text_metric("Batch Summary")
