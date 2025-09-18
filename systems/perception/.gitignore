@@ -1,0 +1,6 @@
+*env/
+./hack/input/
+*/output/
+*/dataset/
+dataset
+*.pyc

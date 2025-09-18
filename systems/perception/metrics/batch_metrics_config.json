@@ -1,0 +1,6 @@
+{
+    "authToken" : "...",
+    "apiURL" : "https://api.resim.ai/v1",
+    "batchID" : "...",
+    "projectID": "..."
+  }
