@@ -1,0 +1,8 @@
+services:
+  talker_listener:
+    image: ${RESIM_TALKER_LISTENER_IMAGE_TAG:-ros2-talker-listener}
+    build:
+      context: .
+      dockerfile: talker_listener.dockerfile
+    labels:
+      resim.ai/ignoreContainerNotFinished: true

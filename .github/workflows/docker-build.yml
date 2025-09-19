@@ -1,0 +1,127 @@
+name: Build, Push & Execute Images
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+env:
+  BUILD_REPO_NAME: core
+  REGISTRY_NAME: public.ecr.aws/resim
+  RESIM_PASSWORD: ${{ secrets.RESIM_PASSWORD }}
+  RESIM_USERNAME: ${{ secrets.RESIM_USERNAME }}
+  PROJECT_NAME: Demo Experience Syncing
+  SIM_SYSTEM: demo_system
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  build-push-ros2-talker-listener:
+    name: Create & Push New ROS2 Talker/Listener Build Image
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.get_image_tag.outputs.image_tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.ECR_RW_ROLE }}
+          aws-region: us-east-1
+
+      - name: Log in to ECR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY_NAME }}
+
+      - name: Docker metadata
+        id: docker_meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ env.REGISTRY_NAME }}/${{ env.BUILD_REPO_NAME }}
+          tags: |
+            type=ref,event=branch,prefix=sandbox-ros2-mcb-
+            type=ref,event=pr,prefix=sandbox-ros2-mcb-pr-
+            type=sha,prefix=sandbox-ros2-mcb-
+
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          base: ${{ github.ref }}
+          filters: |
+            ros2_talker_listener:
+              - systems/ros2_talker_listener/**
+
+      - name: Set up Docker Buildx
+        if: ${{ github.event_name != 'pull_request' || steps.filter.outputs.ros2_talker_listener == 'true'}}
+        uses: docker/setup-buildx-action@v3
+
+      - name: Docker Build Push
+        if: ${{ github.event_name != 'pull_request' || steps.filter.outputs.ros2_talker_listener == 'true'}}
+        id: build-push-build
+        uses: docker/build-push-action@v5
+        with:
+          context: ./systems/ros2_talker_listener
+          file: ./systems/ros2_talker_listener/talker_listener.dockerfile
+          push: true
+          tags: ${{ steps.docker_meta.outputs.tags }}
+
+      - uses: imjasonh/setup-crane@v0.4
+
+      - name: Retag existing image
+        if: ${{ github.event_name == 'pull_request' && steps.filter.outputs.ros2_talker_listener == 'false'}}
+        id: retag_image
+        run: |
+          export IMAGE_URL=$(echo "${{ steps.docker_meta.outputs.tags }}" | tail -n 1)
+          export IMAGE_TAG="${IMAGE_URL##*:}"
+          crane tag ${{ env.REGISTRY_NAME }}/${{ env.BUILD_REPO_NAME }}:sandbox-ros2-mcb-${{ github.event.pull_request.base.ref }} $IMAGE_TAG
+
+      - name: Get Image Tag
+        id: get_image_tag
+        run: |
+          export IMAGE_URL=$(echo "${{ steps.docker_meta.outputs.tags }}" | tail -n 1)
+          echo "image_tag=$IMAGE_URL" >> $GITHUB_OUTPUT
+
+  create-ros2-talker-listener-build:
+    name: Create a build for the ros2 talker + listener
+    runs-on: ubuntu-latest
+    needs: [build-push-ros2-talker-listener]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Fetch ReSim CLI
+        run: |
+          curl -L https://github.com/resim-ai/api-client/releases/latest/download/resim-linux-amd64 -o resim-cli
+          chmod +x resim-cli
+
+      - name: Determine Branch Name and Commit SHA
+        id: determine_branch_and_sha
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "BRANCH_NAME=${{ env.HEAD_REF }}" >> $GITHUB_ENV
+            echo "COMMIT_SHA=${{ github.event.pull_request.head.sha }}" >> $GITHUB_ENV
+          else
+            echo "BRANCH_NAME=${{ env.REF_NAME }}" >> $GITHUB_ENV
+            echo "COMMIT_SHA=${{ github.sha }}" >> $GITHUB_ENV
+          fi
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          REF_NAME: ${{ github.ref_name }}
+
+      - name: Select Project
+        run: |
+          ./resim-cli projects select "${PROJECT_NAME}"
+
+      - name: Register ROS2 Talker Listener Build in ReSim
+        run: |
+          export RESIM_TALKER_LISTENER_IMAGE_TAG=${{ needs.build-push-ros2-talker-listener.outputs.image_tag }}
+          ./resim-cli builds create --build-spec ./systems/ros2_talker_listener/docker-compose.yml --use-os-env \
+            --system $SIM_SYSTEM --name "ROS2 MCB Build" --description "A simple ROS2 talker/listener MCB example" \
+            --version "${{ env.COMMIT_SHA }}" --branch "${{ env.BRANCH_NAME }}" --auto-create-branch
