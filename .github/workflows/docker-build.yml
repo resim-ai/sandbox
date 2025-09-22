@@ -56,7 +56,7 @@ jobs:
           base: ${{ github.ref }}
           filters: |
             ros2_talker_listener:
-              - systems/ros2_talker_listener/**
+              - systems/hello_world/**
 
       - name: Set up Docker Buildx
         if: ${{ github.event_name != 'pull_request' || steps.filter.outputs.ros2_talker_listener == 'true'}}
