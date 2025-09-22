@@ -70,7 +70,7 @@ jobs:
           context: ./systems/ros2_talker_listener
           file: ./systems/ros2_talker_listener/talker_listener.dockerfile
           push: true
-          tags: ${{ steps.docker_meta.outputs.tags }}
+          tags: public.ecr.aws/resim/core:sandbox-ros2-mcb-main
 
       - uses: imjasonh/setup-crane@v0.4
 
