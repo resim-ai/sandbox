@@ -5,4 +5,4 @@ build](https://docs.resim.ai/guides/multi-container-builds/) wherein one service
 `demo_nodes_cpp` talker and the other contains a listener. Finally, we have an orchestrator service
 that terminates the sim once 60 seconds have elapsed. To run this locally, you can run the
 `run_local.sh` script. The `.github/workflows/docker-build.yml` workflow handles automatic building,
-pushing, and registring this multicontainer build with ReSim.
+pushing, and registering this multicontainer build with ReSim.
