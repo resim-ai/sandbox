@@ -1,0 +1,1308 @@
+experiences:
+- name: 20181107132300_camera_frontcenter_000000020
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000020-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000020.png
+  tags:
+  - weather_dry
+  - road_type_interstate
+  - lighting_morning
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000022
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000022-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000022.png
+  tags:
+  - weather_dry
+  - road_type_rural
+  - lighting_day
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000041
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000041-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000041.png
+  tags:
+  - weather_dry
+  - road_type_single
+  - lighting_dusk
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000049
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000049-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000049.png
+  tags:
+  - weather_rain
+  - road_type_interstate
+  - lighting_morning
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000050
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000050-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000050.png
+  tags:
+  - weather_dry
+  - road_type_rural
+  - lighting_morning
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000055
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000055-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000055.png
+  tags:
+  - weather_dry
+  - road_type_interstate
+  - lighting_day
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000057
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000057-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000057.png
+  tags:
+  - weather_rain
+  - road_type_single
+  - lighting_morning
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000063
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000063-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000063.png
+  tags:
+  - weather_dry
+  - road_type_single
+  - lighting_dusk
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000074
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000074-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000074.png
+  tags:
+  - weather_rain
+  - road_type_rural
+  - lighting_night
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000076
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000076-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000076.png
+  tags:
+  - weather_dry
+  - road_type_interstate
+  - lighting_morning
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000084
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000084-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000084.png
+  tags:
+  - weather_dry
+  - road_type_single
+  - lighting_day
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000089
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000089-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000089.png
+  tags:
+  - weather_rain
+  - road_type_interstate
+  - lighting_dusk
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000092
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000092-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000092.png
+  tags:
+  - weather_dry
+  - road_type_single
+  - lighting_morning
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000103
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000103-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000103.png
+  tags:
+  - weather_dry
+  - road_type_interstate
+  - lighting_day
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000110
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000110-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000110.png
+  tags:
+  - weather_dry
+  - road_type_rural
+  - lighting_day
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000113
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000113-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000113.png
+  tags:
+  - weather_dry
+  - road_type_rural
+  - lighting_night
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000128
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000128-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000128.png
+  tags:
+  - weather_dry
+  - road_type_single
+  - lighting_day
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000131
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000131-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000131.png
+  tags:
+  - weather_dry
+  - road_type_rural
+  - lighting_morning
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000132
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000132-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000132.png
+  tags:
+  - weather_dry
+  - road_type_rural
+  - lighting_morning
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000151
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000151-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000151.png
+  tags:
+  - weather_dry
+  - road_type_interstate
+  - lighting_dusk
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000159
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000159-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000159.png
+  tags:
+  - weather_fog
+  - road_type_single
+  - lighting_night
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000167
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000167-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000167.png
+  tags:
+  - weather_fog
+  - road_type_single
+  - lighting_morning
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000168
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000168-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000168.png
+  tags:
+  - weather_dry
+  - road_type_single
+  - lighting_night
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000171
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000171-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000171.png
+  tags:
+  - weather_dry
+  - road_type_interstate
+  - lighting_day
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000183
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000183-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000183.png
+  tags:
+  - weather_dry
+  - road_type_rural
+  - lighting_dusk
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000188
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000188-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000188.png
+  tags:
+  - weather_dry
+  - road_type_rural
+  - lighting_day
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000189
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000189-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000189.png
+  tags:
+  - weather_dry
+  - road_type_rural
+  - lighting_morning
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000206
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000206-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000206.png
+  tags:
+  - weather_fog
+  - road_type_single
+  - lighting_day
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000216
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000216-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000216.png
+  tags:
+  - weather_dry
+  - road_type_interstate
+  - lighting_day
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000246
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000246-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000246.png
+  tags:
+  - weather_dry
+  - road_type_single
+  - lighting_morning
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000253
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000253-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000253.png
+  tags:
+  - weather_rain
+  - road_type_single
+  - lighting_morning
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000260
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000260-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000260.png
+  tags:
+  - weather_dry
+  - road_type_single
+  - lighting_dusk
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000280
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000280-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000280.png
+  tags:
+  - weather_dry
+  - road_type_single
+  - lighting_dusk
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000282
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000282-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000282.png
+  tags:
+  - weather_dry
+  - road_type_single
+  - lighting_day
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000284
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000284-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000284.png
+  tags:
+  - weather_dry
+  - road_type_interstate
+  - lighting_dusk
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000286
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000286-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000286.png
+  tags:
+  - weather_dry
+  - road_type_rural
+  - lighting_morning
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000292
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000292-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000292.png
+  tags:
+  - weather_dry
+  - road_type_rural
+  - lighting_night
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000298
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000298-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000298.png
+  tags:
+  - weather_dry
+  - road_type_interstate
+  - lighting_night
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000299
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000299-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000299.png
+  tags:
+  - weather_dry
+  - road_type_rural
+  - lighting_night
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000302
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000302-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000302.png
+  tags:
+  - weather_rain
+  - road_type_single
+  - lighting_morning
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000320
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000320-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000320.png
+  tags:
+  - weather_dry
+  - road_type_interstate
+  - lighting_night
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000324
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000324-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000324.png
+  tags:
+  - weather_fog
+  - road_type_interstate
+  - lighting_dusk
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000334
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000334-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000334.png
+  tags:
+  - weather_dry
+  - road_type_interstate
+  - lighting_dusk
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000342
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000342-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000342.png
+  tags:
+  - weather_dry
+  - road_type_single
+  - lighting_morning
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000365
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000365-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000365.png
+  tags:
+  - weather_rain
+  - road_type_rural
+  - lighting_night
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000371
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000371-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000371.png
+  tags:
+  - weather_dry
+  - road_type_rural
+  - lighting_day
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000379
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000379-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000379.png
+  tags:
+  - weather_dry
+  - road_type_interstate
+  - lighting_night
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000384
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000384-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000384.png
+  tags:
+  - weather_dry
+  - road_type_single
+  - lighting_morning
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000387
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000387-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000387.png
+  tags:
+  - weather_rain
+  - road_type_interstate
+  - lighting_morning
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000389
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000389-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000389.png
+  tags:
+  - weather_dry
+  - road_type_rural
+  - lighting_dusk
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000390
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000390-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000390.png
+  tags:
+  - weather_dry
+  - road_type_rural
+  - lighting_day
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000395
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000395-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000395.png
+  tags:
+  - weather_dry
+  - road_type_interstate
+  - lighting_day
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000412
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000412-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000412.png
+  tags:
+  - weather_rain
+  - road_type_interstate
+  - lighting_night
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000418
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000418-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000418.png
+  tags:
+  - weather_dry
+  - road_type_single
+  - lighting_day
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000421
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000421-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000421.png
+  tags:
+  - weather_rain
+  - road_type_rural
+  - lighting_day
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000428
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000428-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000428.png
+  tags:
+  - weather_dry
+  - road_type_interstate
+  - lighting_dusk
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000430
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000430-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000430.png
+  tags:
+  - weather_dry
+  - road_type_single
+  - lighting_night
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000433
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000433-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000433.png
+  tags:
+  - weather_dry
+  - road_type_interstate
+  - lighting_dusk
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000436
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000436-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000436.png
+  tags:
+  - weather_fog
+  - road_type_interstate
+  - lighting_night
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000438
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000438-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000438.png
+  tags:
+  - weather_dry
+  - road_type_single
+  - lighting_dusk
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000459
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000459-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000459.png
+  tags:
+  - weather_fog
+  - road_type_rural
+  - lighting_morning
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000466
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000466-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000466.png
+  tags:
+  - weather_rain
+  - road_type_single
+  - lighting_night
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000485
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000485-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000485.png
+  tags:
+  - weather_rain
+  - road_type_interstate
+  - lighting_day
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000500
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000500-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000500.png
+  tags:
+  - weather_dry
+  - road_type_interstate
+  - lighting_dusk
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000502
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000502-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000502.png
+  tags:
+  - weather_dry
+  - road_type_interstate
+  - lighting_dusk
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000507
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000507-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000507.png
+  tags:
+  - weather_rain
+  - road_type_single
+  - lighting_day
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000537
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000537-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000537.png
+  tags:
+  - weather_dry
+  - road_type_rural
+  - lighting_day
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000557
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000557-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000557.png
+  tags:
+  - weather_dry
+  - road_type_single
+  - lighting_dusk
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000560
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000560-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000560.png
+  tags:
+  - weather_dry
+  - road_type_single
+  - lighting_morning
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000588
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000588-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000588.png
+  tags:
+  - weather_fog
+  - road_type_single
+  - lighting_night
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000598
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000598-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000598.png
+  tags:
+  - weather_rain
+  - road_type_single
+  - lighting_night
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000604
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000604-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000604.png
+  tags:
+  - weather_dry
+  - road_type_single
+  - lighting_morning
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000616
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000616-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000616.png
+  tags:
+  - weather_dry
+  - road_type_rural
+  - lighting_morning
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000618
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000618-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000618.png
+  tags:
+  - weather_dry
+  - road_type_interstate
+  - lighting_morning
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000627
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000627-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000627.png
+  tags:
+  - weather_dry
+  - road_type_rural
+  - lighting_night
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000632
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000632-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000632.png
+  tags:
+  - weather_dry
+  - road_type_single
+  - lighting_night
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000643
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000643-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000643.png
+  tags:
+  - weather_fog
+  - road_type_interstate
+  - lighting_dusk
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000647
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000647-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000647.png
+  tags:
+  - weather_dry
+  - road_type_interstate
+  - lighting_day
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000654
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000654-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000654.png
+  tags:
+  - weather_dry
+  - road_type_rural
+  - lighting_night
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000662
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000662-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000662.png
+  tags:
+  - weather_dry
+  - road_type_interstate
+  - lighting_morning
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000682
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000682-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000682.png
+  tags:
+  - weather_dry
+  - road_type_rural
+  - lighting_dusk
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000686
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000686-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000686.png
+  tags:
+  - weather_fog
+  - road_type_rural
+  - lighting_morning
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000704
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000704-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000704.png
+  tags:
+  - weather_fog
+  - road_type_rural
+  - lighting_dusk
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000709
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000709-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000709.png
+  tags:
+  - weather_dry
+  - road_type_rural
+  - lighting_dusk
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000712
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000712-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000712.png
+  tags:
+  - weather_dry
+  - road_type_single
+  - lighting_morning
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000714
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000714-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000714.png
+  tags:
+  - weather_rain
+  - road_type_single
+  - lighting_day
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000737
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000737-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000737.png
+  tags:
+  - weather_dry
+  - road_type_interstate
+  - lighting_day
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000757
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000757-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000757.png
+  tags:
+  - weather_dry
+  - road_type_single
+  - lighting_day
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000763
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000763-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000763.png
+  tags:
+  - weather_rain
+  - road_type_interstate
+  - lighting_dusk
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000765
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000765-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000765.png
+  tags:
+  - weather_dry
+  - road_type_rural
+  - lighting_night
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000782
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000782-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000782.png
+  tags:
+  - weather_dry
+  - road_type_interstate
+  - lighting_night
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000788
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000788-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000788.png
+  tags:
+  - weather_rain
+  - road_type_interstate
+  - lighting_day
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000794
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000794-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000794.png
+  tags:
+  - weather_rain
+  - road_type_rural
+  - lighting_dusk
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000799
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000799-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000799.png
+  tags:
+  - weather_fog
+  - road_type_rural
+  - lighting_night
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000802
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000802-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000802.png
+  tags:
+  - weather_fog
+  - road_type_interstate
+  - lighting_dusk
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000810
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000810-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000810.png
+  tags:
+  - weather_dry
+  - road_type_rural
+  - lighting_night
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000812
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000812-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000812.png
+  tags:
+  - weather_dry
+  - road_type_rural
+  - lighting_night
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000813
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000813-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000813.png
+  tags:
+  - weather_rain
+  - road_type_single
+  - lighting_night
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000818
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000818-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000818.png
+  tags: []
+  systems:
+  - perception
+  archived: false
+- name: 20181107132300_camera_frontcenter_000000825
+  description: synced experience from follow_truck safety set
+  locations:
+  - /experiences/20181107132300_camera_frontcenter_000000825-truth.csv
+  - /experiences/20181107132300_camera_frontcenter_000000825.png
+  tags: []
+  systems:
+  - perception
+  archived: false
+managedTestSuites:
+- name: truck_follow_safety_set
+  description: Test suite for truck following safety scenarios
+  experiences:
+  - 20181107132300_camera_frontcenter_000000020
+  - 20181107132300_camera_frontcenter_000000022
+  - 20181107132300_camera_frontcenter_000000041
+  - 20181107132300_camera_frontcenter_000000049
+  - 20181107132300_camera_frontcenter_000000050
+  - 20181107132300_camera_frontcenter_000000055
+  - 20181107132300_camera_frontcenter_000000057
+  - 20181107132300_camera_frontcenter_000000063
+  - 20181107132300_camera_frontcenter_000000074
+  - 20181107132300_camera_frontcenter_000000076
+  - 20181107132300_camera_frontcenter_000000084
+  - 20181107132300_camera_frontcenter_000000089
+  - 20181107132300_camera_frontcenter_000000092
+  - 20181107132300_camera_frontcenter_000000103
+  - 20181107132300_camera_frontcenter_000000110
+  - 20181107132300_camera_frontcenter_000000113
+  - 20181107132300_camera_frontcenter_000000128
+  - 20181107132300_camera_frontcenter_000000131
+  - 20181107132300_camera_frontcenter_000000132
+  - 20181107132300_camera_frontcenter_000000151
+  - 20181107132300_camera_frontcenter_000000159
+  - 20181107132300_camera_frontcenter_000000167
+  - 20181107132300_camera_frontcenter_000000168
+  - 20181107132300_camera_frontcenter_000000171
+  - 20181107132300_camera_frontcenter_000000183
+  - 20181107132300_camera_frontcenter_000000188
+  - 20181107132300_camera_frontcenter_000000189
+  - 20181107132300_camera_frontcenter_000000206
+  - 20181107132300_camera_frontcenter_000000216
+  - 20181107132300_camera_frontcenter_000000246
+  - 20181107132300_camera_frontcenter_000000253
+  - 20181107132300_camera_frontcenter_000000260
+  - 20181107132300_camera_frontcenter_000000280
+  - 20181107132300_camera_frontcenter_000000282
+  - 20181107132300_camera_frontcenter_000000284
+  - 20181107132300_camera_frontcenter_000000286
+  - 20181107132300_camera_frontcenter_000000292
+  - 20181107132300_camera_frontcenter_000000298
+  - 20181107132300_camera_frontcenter_000000299
+  - 20181107132300_camera_frontcenter_000000302
+  - 20181107132300_camera_frontcenter_000000320
+  - 20181107132300_camera_frontcenter_000000324
+  - 20181107132300_camera_frontcenter_000000334
+  - 20181107132300_camera_frontcenter_000000342
+  - 20181107132300_camera_frontcenter_000000365
+  - 20181107132300_camera_frontcenter_000000371
+  - 20181107132300_camera_frontcenter_000000379
+  - 20181107132300_camera_frontcenter_000000384
+  - 20181107132300_camera_frontcenter_000000387
+  - 20181107132300_camera_frontcenter_000000389
+  - 20181107132300_camera_frontcenter_000000390
+  - 20181107132300_camera_frontcenter_000000395
+  - 20181107132300_camera_frontcenter_000000412
+  - 20181107132300_camera_frontcenter_000000418
+  - 20181107132300_camera_frontcenter_000000421
+  - 20181107132300_camera_frontcenter_000000428
+  - 20181107132300_camera_frontcenter_000000430
+  - 20181107132300_camera_frontcenter_000000433
+  - 20181107132300_camera_frontcenter_000000436
+  - 20181107132300_camera_frontcenter_000000438
+  - 20181107132300_camera_frontcenter_000000459
+  - 20181107132300_camera_frontcenter_000000466
+  - 20181107132300_camera_frontcenter_000000485
+  - 20181107132300_camera_frontcenter_000000500
+  - 20181107132300_camera_frontcenter_000000502
+  - 20181107132300_camera_frontcenter_000000507
+  - 20181107132300_camera_frontcenter_000000537
+  - 20181107132300_camera_frontcenter_000000557
+  - 20181107132300_camera_frontcenter_000000560
+  - 20181107132300_camera_frontcenter_000000588
+  - 20181107132300_camera_frontcenter_000000598
+  - 20181107132300_camera_frontcenter_000000604
+  - 20181107132300_camera_frontcenter_000000616
+  - 20181107132300_camera_frontcenter_000000618
+  - 20181107132300_camera_frontcenter_000000627
+  - 20181107132300_camera_frontcenter_000000632
+  - 20181107132300_camera_frontcenter_000000643
+  - 20181107132300_camera_frontcenter_000000647
+  - 20181107132300_camera_frontcenter_000000654
+  - 20181107132300_camera_frontcenter_000000662
+  - 20181107132300_camera_frontcenter_000000682
+  - 20181107132300_camera_frontcenter_000000686
+  - 20181107132300_camera_frontcenter_000000704
+  - 20181107132300_camera_frontcenter_000000709
+  - 20181107132300_camera_frontcenter_000000712
+  - 20181107132300_camera_frontcenter_000000714
+  - 20181107132300_camera_frontcenter_000000737
+  - 20181107132300_camera_frontcenter_000000757
+  - 20181107132300_camera_frontcenter_000000763
+  - 20181107132300_camera_frontcenter_000000765
+  - 20181107132300_camera_frontcenter_000000782
+  - 20181107132300_camera_frontcenter_000000788
+  - 20181107132300_camera_frontcenter_000000794
+  - 20181107132300_camera_frontcenter_000000799
+  - 20181107132300_camera_frontcenter_000000802
+  - 20181107132300_camera_frontcenter_000000810
+  - 20181107132300_camera_frontcenter_000000812
+  - 20181107132300_camera_frontcenter_000000813
+managedExperienceTags:
+- road_type_single
+- road_type_interstate
+- road_type_rural
+- weather_rain
+- weather_dry
+- weather_fog
+- lighting_morning
+- lighting_dusk
+- lighting_day
+- lighting_night
