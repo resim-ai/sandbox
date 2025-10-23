@@ -1,5 +1,5 @@
-class,bbox,color
-Car,"[460, 685, 639, 814]","[0, 0, 255]"
-Car,"[697, 673, 868, 816]","[0, 0, 255]"
-Car,"[819, 655, 907, 744]","[0, 0, 255]"
-Car,"[955, 572, 1087, 755]","[0, 0, 255]"
+class,bbox,color,weather,road_type,lighting
+Car,"[460, 685, 639, 814]","[0, 0, 255]",fog,interstate,dusk
+Car,"[697, 673, 868, 816]","[0, 0, 255]",fog,interstate,dusk
+Car,"[819, 655, 907, 744]","[0, 0, 255]",fog,interstate,dusk
+Car,"[955, 572, 1087, 755]","[0, 0, 255]",fog,interstate,dusk

@@ -1,2 +1,2 @@
-class,bbox,color
-Car,"[905, 544, 1101, 803]","[0, 0, 255]"
+class,bbox,color,weather,road_type,lighting
+Car,"[905, 544, 1101, 803]","[0, 0, 255]",fog,interstate,dusk

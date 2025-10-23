@@ -1,2 +1,2 @@
-class,bbox,color
-Car,"[919, 532, 1136, 810]","[0, 0, 255]"
+class,bbox,color,weather,road_type,lighting
+Car,"[919, 532, 1136, 810]","[0, 0, 255]",fog,single,morning

@@ -1,3 +1,3 @@
-class,bbox,color
-Car,"[249, 673, 648, 959]","[0, 0, 255]"
-Car,"[900, 530, 1107, 800]","[0, 0, 255]"
+class,bbox,color,weather,road_type,lighting
+Car,"[249, 673, 648, 959]","[0, 0, 255]",dry,rural,night
+Car,"[900, 530, 1107, 800]","[0, 0, 255]",dry,rural,night

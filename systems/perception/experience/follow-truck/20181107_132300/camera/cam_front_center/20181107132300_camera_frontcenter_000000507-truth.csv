@@ -1,4 +1,4 @@
-class,bbox,color
-Car,"[158, 702, 612, 1017]","[0, 0, 255]"
-Car,"[782, 672, 898, 774]","[0, 0, 255]"
-Car,"[933, 548, 1115, 799]","[0, 0, 255]"
+class,bbox,color,weather,road_type,lighting
+Car,"[158, 702, 612, 1017]","[0, 0, 255]",rain,single,day
+Car,"[782, 672, 898, 774]","[0, 0, 255]",rain,single,day
+Car,"[933, 548, 1115, 799]","[0, 0, 255]",rain,single,day

@@ -1,5 +1,5 @@
-class,bbox,color
-Car,"[947, 574, 1084, 768]","[0, 0, 255]"
-Car,"[863, 678, 937, 747]","[0, 0, 255]"
-Car,"[629, 683, 740, 768]","[0, 0, 255]"
-Car,"[2, 653, 392, 945]","[0, 0, 255]"
+class,bbox,color,weather,road_type,lighting
+Car,"[947, 574, 1084, 768]","[0, 0, 255]",dry,single,morning
+Car,"[863, 678, 937, 747]","[0, 0, 255]",dry,single,morning
+Car,"[629, 683, 740, 768]","[0, 0, 255]",dry,single,morning
+Car,"[2, 653, 392, 945]","[0, 0, 255]",dry,single,morning

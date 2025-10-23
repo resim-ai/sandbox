@@ -1,2 +1,2 @@
-class,bbox,color
-Car,"[906, 535, 1102, 810]","[0, 0, 255]"
+class,bbox,color,weather,road_type,lighting
+Car,"[906, 535, 1102, 810]","[0, 0, 255]",dry,interstate,dusk

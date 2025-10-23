@@ -1,4 +1,4 @@
-class,bbox,color
-Car,"[754, 685, 823, 733]","[0, 0, 255]"
-Car,"[865, 679, 920, 733]","[0, 0, 255]"
-Car,"[935, 569, 1083, 771]","[0, 0, 255]"
+class,bbox,color,weather,road_type,lighting
+Car,"[754, 685, 823, 733]","[0, 0, 255]",dry,rural,night
+Car,"[865, 679, 920, 733]","[0, 0, 255]",dry,rural,night
+Car,"[935, 569, 1083, 771]","[0, 0, 255]",dry,rural,night
