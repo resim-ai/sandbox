@@ -1,0 +1,89 @@
+version: 1
+
+topics:
+  object: # this is an event topic for a single object in the scene
+    event: true
+    schema:
+      name: string
+      description: string
+      status: status
+      tags: string[]
+  gt_object:
+    schema:
+      filename: string
+      type: string
+      x1: float
+      y1: float
+      x2: float
+      y2: float
+  detection:
+    schema:
+      filename: string
+      x1: float
+      y1: float
+      x2: float
+      y2: float
+      score: float
+  image:
+    schema:
+      filename: string
+      number_of_objects: int
+      road_type: string
+      weather: string
+      lighting: string
+  
+  visualization:
+    schema:
+      filename: string
+      image_path: string
+      visualization_type: string
+
+metrics:
+  # Detection confidence histogram
+  Detection Confidence Distribution:
+    type: test
+    description: Histogram of detection confidence scores
+    query_string: SELECT CASE WHEN score >= 0.9 THEN '0.9-1.0' WHEN score >= 0.8 THEN '0.8-0.9' WHEN score >= 0.7 THEN '0.7-0.8' WHEN score >= 0.6 THEN '0.6-0.7' WHEN score >= 0.5 THEN '0.5-0.6' ELSE '0.0-0.5' END as "Confidence Range", COUNT(*) as "Count" FROM detection GROUP BY CASE WHEN score >= 0.9 THEN '0.9-1.0' WHEN score >= 0.8 THEN '0.8-0.9' WHEN score >= 0.7 THEN '0.7-0.8' WHEN score >= 0.6 THEN '0.6-0.7' WHEN score >= 0.5 THEN '0.5-0.6' ELSE '0.0-0.5' END
+    template_type: system
+    template: bar
+  
+  # IoU score histogram for matched detections
+  IoU Score Distribution:
+    type: test
+    description: Histogram of IoU scores for matched detections
+    query_string: SELECT CASE WHEN CAST(SUBSTRING(description, 6, 6) AS DOUBLE) >= 0.9 THEN '0.9-1.0' WHEN CAST(SUBSTRING(description, 6, 6) AS DOUBLE) >= 0.7 THEN '0.7-0.9' WHEN CAST(SUBSTRING(description, 6, 6) AS DOUBLE) >= 0.5 THEN '0.5-0.7' ELSE '0.0-0.5' END as "IoU Range", COUNT(*) as "Count" FROM object WHERE tags LIKE '%true_positive%' GROUP BY CASE WHEN CAST(SUBSTRING(description, 6, 6) AS DOUBLE) >= 0.9 THEN '0.9-1.0' WHEN CAST(SUBSTRING(description, 6, 6) AS DOUBLE) >= 0.7 THEN '0.7-0.9' WHEN CAST(SUBSTRING(description, 6, 6) AS DOUBLE) >= 0.5 THEN '0.5-0.7' ELSE '0.0-0.5' END
+    template_type: system
+    template: bar
+  
+  # Detection types distribution
+  Detection Types:
+    type: test
+    description: Distribution of detection types (true positive, false positive, false negative)
+    query_string: SELECT tags[1] as "Detection Type", COUNT(*) as "Count" FROM object GROUP BY tags[1]
+    template_type: system
+    template: bar
+  
+  # Average confidence by detection type
+  Average Confidence by Type:
+    type: test
+    description: Average confidence score by detection type
+    query_string: SELECT tags[1] as "Detection Type", AVG(CAST(SUBSTRING(description, 15, 6) AS DOUBLE)) as "Average Confidence" FROM object WHERE tags LIKE '%false_positive%' OR tags LIKE '%true_positive%' GROUP BY tags[1]
+    template_type: system
+    template: bar
+  
+  # Object events summary
+  Object Events:
+    type: test
+    description: Summary of all object detection events
+    query_string: SELECT name as "Event Name", description as "Description", status as "Status" FROM object
+    template_type: system
+    template: scalar
+  
+  # Enhanced visualization images
+  Enhanced Visualizations:
+    type: test
+    description: Enhanced visualization images with detection IDs and match indicators
+    query_string: SELECT image_path as "Image" FROM visualization WHERE visualization_type = 'enhanced'
+    template_type: system
+    template: image
+  

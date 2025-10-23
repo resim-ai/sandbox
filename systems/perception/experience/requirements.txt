@@ -39,6 +39,7 @@ pytz==2025.2
 PyYAML==6.0.2
 regex==2024.11.6
 requests==2.32.4
+resim-open-core>=0.16.0
 safetensors==0.5.3
 six==1.17.0
 sympy==1.14.0
