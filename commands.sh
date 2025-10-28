@@ -38,3 +38,5 @@ docker push 909785973729.dkr.ecr.us-east-1.amazonaws.com/customer-test-images:pe
 
 -----
 ./resim test-suites run --test-suite "truck_follow_safety_set" --build-id "4a117ffc-a864-41a4-830b-aa32c072f4c7"
+
+./resim test-suites run --test-suite "truck_follow_safety_set" --build-id "4a117ffc-a864-41a4-830b-aa32c072f4c7" --sync-metrics-config --pool-labels "resim:metrics2:k8s"
