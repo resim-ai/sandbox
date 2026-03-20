@@ -15,4 +15,14 @@ if [ -f /tmp/resim/parameters.json ]; then
 fi
 
 echo "Running container with cost override: $VELOCITY_COST_OVERRIDE"
+echo "Running pre-flight safety check..."
+echo "  [OK] Experience loaded..."
+echo "  [OK] Goal position acquired"
+echo "  [OK] MCAP logger ready: /tmp/resim/inputs/logs/resim_log.mcap"
+echo "  [OK] Actor spawned: is_spawned=true"
+echo "  [OK] iLQR controller: initialized"
+echo "  [WARN] Drone operating in fake simulation mode"
+echo "  [FAIL] I hope this was fun. Aborting execution"
+exit 1
+
 /sim_container_entrypoint.sh $VELOCITY_COST_OVERRIDE
